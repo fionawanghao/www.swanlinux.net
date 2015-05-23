@@ -68,19 +68,21 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2013/02/12/linux_ftp/" title="Linux 系统中文件共享之 FTP" itemprop="url">
+    <a href="/2013/02/12/linux_firewall_setting/" title="Linux系统中防火墙配置" itemprop="url">
   
-    <h1 itemprop="name">Linux 系统中文件共享之 FTP</h1>
+    <h1 itemprop="name">Linux系统中防火墙配置</h1>
     
      
-           <p itemprop="description" >FTP 的安装
-安装文件名称是vsftpd-2.0.1-5.i386.rpm 
-[root@nmred ~]# yum install vsftpd*
-FTP 配置
-1.配置文件简介
-1）vsftpd.conf配置文件
-vsftpd.conf是vsftpd服务器的主配置文件
-/e</p>
+           <p itemprop="description" >网络层防火墙的应用原理
+1.网络防火墙工作在TCP/IP的网络层
+
+2.iptables规则链
+
+3.iptables的三个表
+iptables缺省具有3个规则表
+1)Filter：用于设置包过滤
+Filter：INPUT、FORWARD、OUTPUT
+2)NAT：用于设置地址转</p>
         
     
     <time datetime="2013-02-12T10:13:16.000Z" itemprop="datePublished">2月 12 2013</time>
@@ -113,6 +115,22 @@ vsftpd.conf是vsftpd服务器的主配置文件
 
   <section class="post" itemscope itemprop="blogPost">
   
+    <a href="/2013/02/12/linux_cd_recover/" title="Linux 系统光盘修复" itemprop="url">
+  
+    <h1 itemprop="name">Linux 系统光盘修复</h1>
+    
+     
+           <p itemprop="description" >光盘修复备份过的文件
+案例背景：系统中/etc原来已经备份到/backup一份，但是在操作中误删除了/etc/inittab或把grub.conf文件的title行删除掉了，重新启动Linux后系统无法引导，从/backup目录下恢复文件。(没有备份修复的方法下面介绍)
+1.设置</p>
+        
+    
+    <time datetime="2013-02-12T10:13:16.000Z" itemprop="datePublished">2月 12 2013</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
     <a href="/2013/02/12/linux_bg_shell/" title="Linux 系统后台执行命令解析" itemprop="url">
   
     <h1 itemprop="name">Linux 系统后台执行命令解析</h1>
@@ -123,22 +141,6 @@ cron ：系统调度进程，可以使用它在每天的非高峰负荷时间段
 at : at命令 使用它在一个特定的时间运行一些特殊的作业，或在晚一些的非负荷高峰时间段或高峰负荷时间运行
 &amp; 使用它在后台运行一个占用时间不长的进程
 Noh</p>
-        
-    
-    <time datetime="2013-02-12T10:13:16.000Z" itemprop="datePublished">2月 12 2013</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2013/02/12/linux_cd_recover/" title="Linux 系统光盘修复" itemprop="url">
-  
-    <h1 itemprop="name">Linux 系统光盘修复</h1>
-    
-     
-           <p itemprop="description" >光盘修复备份过的文件
-案例背景：系统中/etc原来已经备份到/backup一份，但是在操作中误删除了/etc/inittab或把grub.conf文件的title行删除掉了，重新启动Linux后系统无法引导，从/backup目录下恢复文件。(没有备份修复的方法下面介绍)
-1.设置</p>
         
     
     <time datetime="2013-02-12T10:13:16.000Z" itemprop="datePublished">2月 12 2013</time>
@@ -165,16 +167,19 @@ HTTPD安装的说明
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2013/02/12/linux_sudo_acl/" title="Linux权限控制sudo/acl" itemprop="url">
+    <a href="/2013/02/12/linux_network_setting/" title="Linux 系统网络设置及常用命令" itemprop="url">
   
-    <h1 itemprop="name">Linux权限控制sudo/acl</h1>
+    <h1 itemprop="name">Linux 系统网络设置及常用命令</h1>
     
      
-           <p itemprop="description" >利用sudo控制执行权限
-1.确认sudo软件的安装
-2.通过sudo授权用户可以修改配置文件和管理服务脚本：
-[root@nmred ~]# visudo
-helen localhost=/bin/vi /etc/httpd/conf/http.conf,/etc/rc.d/i</p>
+           <p itemprop="description" >设置网络
+1.设置ip/netmask
+1)临时设置：
+[root@nmred ~]# ifconfig eth0 192.168.216.2
+2)永久设置
+2.设置DNS
+文件中最多可以有3个“nameserver”配置记录
+系统会优先使用文件中前面的“nameserver”配</p>
         
     
     <time datetime="2013-02-12T10:13:16.000Z" itemprop="datePublished">2月 12 2013</time>

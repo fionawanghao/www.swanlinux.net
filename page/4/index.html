@@ -108,6 +108,59 @@ int fstat(in</p>
 
   <section class="post" itemscope itemprop="blogPost">
   
+    <a href="/2013/05/14/unix_note_file_state/" title="系统数据文件和信息" itemprop="url">
+  
+    <h1 itemprop="name">系统数据文件和信息</h1>
+    
+     
+           <p itemprop="description" >口令文件
+POSIX.1 只定义了两个获取口令文件项的函数，在给出用户登录名或数值用户 ID 后，这两个函数就能查询相关项。
+结构：
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+struct {
+	char *pw_nam</p>
+        
+    
+    <time datetime="2013-05-14T10:13:16.000Z" itemprop="datePublished">5月 14 2013</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2013/05/14/unix_note_stanard_file_io/" title="标准 IO 库" itemprop="url">
+  
+    <h1 itemprop="name">标准 IO 库</h1>
+    
+     
+           <p itemprop="description" >流和 FILE 对象
+标准I/O文件流可用于单字节或多字节字符集，流的定向决定了所读、写的字符是单字节还是多字节的。当一个流最初被创建时，它并没有定向。如若在一个未定向的流上使用一个多字节的I/O函数，则将该流的定向设置为宽定向的，如若在未定向的流上使用一个单字节的I/O函数，则</p>
+        
+    
+    <time datetime="2013-05-14T10:13:16.000Z" itemprop="datePublished">5月 14 2013</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
     <a href="/2013/05/14/unix_note_public.c/" title="UNIX 环境编程测试公共函数" itemprop="url">
   
     <h1 itemprop="name">UNIX 环境编程测试公共函数</h1>
@@ -169,13 +222,14 @@ int fstat(in</p>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2013/05/14/unix_note_stanard_file_io/" title="标准 IO 库" itemprop="url">
+    <a href="/2013/05/14/unix_note_file_io/" title="文件IO" itemprop="url">
   
-    <h1 itemprop="name">标准 IO 库</h1>
+    <h1 itemprop="name">文件IO</h1>
     
      
-           <p itemprop="description" >流和 FILE 对象
-标准I/O文件流可用于单字节或多字节字符集，流的定向决定了所读、写的字符是单字节还是多字节的。当一个流最初被创建时，它并没有定向。如若在一个未定向的流上使用一个多字节的I/O函数，则将该流的定向设置为宽定向的，如若在未定向的流上使用一个单字节的I/O函数，则</p>
+           <p itemprop="description" >文件描述符
+对于内核而言，所有打开的文件都通过文件描述符引用。文件描述符是一个非负整数。当打开一个现有文件或创建一个新文件时，内核向进程返回一个文件描述符。当读写一个文件时，使用 open 或 creat 返回的文件描述符表示该文件。将其作为参数传给 read 或 write.
+</p>
         
     
     <time datetime="2013-05-14T10:13:16.000Z" itemprop="datePublished">5月 14 2013</time>
@@ -201,55 +255,19 @@ int fstat(in</p>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2013/05/14/unix_note_file_state/" title="系统数据文件和信息" itemprop="url">
+    <a href="/2013/02/12/linux_sudo_acl/" title="Linux权限控制sudo/acl" itemprop="url">
   
-    <h1 itemprop="name">系统数据文件和信息</h1>
+    <h1 itemprop="name">Linux权限控制sudo/acl</h1>
     
      
-           <p itemprop="description" >口令文件
-POSIX.1 只定义了两个获取口令文件项的函数，在给出用户登录名或数值用户 ID 后，这两个函数就能查询相关项。
-结构：
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-struct {
-	char *pw_nam</p>
+           <p itemprop="description" >利用sudo控制执行权限
+1.确认sudo软件的安装
+2.通过sudo授权用户可以修改配置文件和管理服务脚本：
+[root@nmred ~]# visudo
+helen localhost=/bin/vi /etc/httpd/conf/http.conf,/etc/rc.d/i</p>
         
     
-    <time datetime="2013-05-14T10:13:16.000Z" itemprop="datePublished">5月 14 2013</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2013/05/14/unix_note_file_io/" title="文件IO" itemprop="url">
-  
-    <h1 itemprop="name">文件IO</h1>
-    
-     
-           <p itemprop="description" >文件描述符
-对于内核而言，所有打开的文件都通过文件描述符引用。文件描述符是一个非负整数。当打开一个现有文件或创建一个新文件时，内核向进程返回一个文件描述符。当读写一个文件时，使用 open 或 creat 返回的文件描述符表示该文件。将其作为参数传给 read 或 write.
-</p>
-        
-    
-    <time datetime="2013-05-14T10:13:16.000Z" itemprop="datePublished">5月 14 2013</time>
+    <time datetime="2013-02-12T10:13:16.000Z" itemprop="datePublished">2月 12 2013</time>
   </a>
 </section>
 
@@ -291,29 +309,6 @@ service</p>
 1)提供对HTTP和FTP协议的代理服务
 2)缓存代理的内容，提高客户端访问网站的速度，并能够节约出口网络流量
 3)对客户端地址进行访问控制，限制允许访问squid服务器</p>
-        
-    
-    <time datetime="2013-02-12T10:13:16.000Z" itemprop="datePublished">2月 12 2013</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2013/02/12/linux_firewall_setting/" title="Linux系统中防火墙配置" itemprop="url">
-  
-    <h1 itemprop="name">Linux系统中防火墙配置</h1>
-    
-     
-           <p itemprop="description" >网络层防火墙的应用原理
-1.网络防火墙工作在TCP/IP的网络层
-
-2.iptables规则链
-
-3.iptables的三个表
-iptables缺省具有3个规则表
-1)Filter：用于设置包过滤
-Filter：INPUT、FORWARD、OUTPUT
-2)NAT：用于设置地址转</p>
         
     
     <time datetime="2013-02-12T10:13:16.000Z" itemprop="datePublished">2月 12 2013</time>

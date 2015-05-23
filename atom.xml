@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://www.swanlinux.net/"/>
-  <updated>2015-05-23T21:21:10.908Z</updated>
+  <updated>2015-05-23T23:10:55.746Z</updated>
   <id>http://www.swanlinux.net/</id>
   
   <author>
@@ -361,7 +361,7 @@ Time: <span class="number">9</span>:<span class="number">28</span>
     <link href="http://www.swanlinux.net/2014/10/24/scala_note_16/"/>
     <id>http://www.swanlinux.net/2014/10/24/scala_note_16/</id>
     <published>2014-10-24T11:42:16.000Z</published>
-    <updated>2015-04-09T19:06:05.521Z</updated>
+    <updated>2015-05-23T22:03:07.643Z</updated>
     <content type="html"><![CDATA[<p>\1. <fred/>(0) 得到什么？<fred/>(0)(0)呢？为什么？</p>
 <p>\2. 如下代码的值是什么？</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre>1
@@ -385,7 +385,7 @@ Time: <span class="number">9</span>:<span class="number">28</span>
     <link href="http://www.swanlinux.net/2014/10/22/scala_note_15/"/>
     <id>http://www.swanlinux.net/2014/10/22/scala_note_15/</id>
     <published>2014-10-22T11:42:16.000Z</published>
-    <updated>2015-04-09T19:06:05.521Z</updated>
+    <updated>2015-05-23T22:03:07.643Z</updated>
     <content type="html"><![CDATA[<p>\1. 编写四个Junit测试案例，分别使用带或不带某个函数的@Test注解。用 Junit执行这些测试。</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre>1
 2
@@ -789,7 +789,7 @@ public int factorial(int);
     <link href="http://www.swanlinux.net/2014/10/21/scala_note_14/"/>
     <id>http://www.swanlinux.net/2014/10/21/scala_note_14/</id>
     <published>2014-10-21T11:42:16.000Z</published>
-    <updated>2015-04-09T19:06:05.520Z</updated>
+    <updated>2015-05-23T22:03:07.643Z</updated>
     <content type="html"><![CDATA[<p>\1. JDK 发行包有一个src.zip文件包含了JDK的大多数源代码。解压并搜索样例标签（用正则表达式case[^:]+:）。然后查找以//开头并包含[Ff]alls?thr 的注释，捕获类似// Falls through 或 // just fall thru 这样的注释。假定JDK的程序名遵守Java编码习惯，在该写注释的地方写下了这些注释，有多少百分比的样例是会掉入到下一个分支的？</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre>1
 </pre></td><td class="code"><pre>略
@@ -1150,7 +1150,7 @@ public int factorial(int);
     <link href="http://www.swanlinux.net/2014/10/19/scala_note_13/"/>
     <id>http://www.swanlinux.net/2014/10/19/scala_note_13/</id>
     <published>2014-10-19T06:42:16.000Z</published>
-    <updated>2015-04-09T19:06:05.520Z</updated>
+    <updated>2015-05-23T22:03:07.643Z</updated>
     <content type="html"><![CDATA[<p>\1. 编写一个函数，给定字符串，产出一个包含所有字符的下标的映射。举例来说，indexes(“Mississippi”)应返回一个映射，让’M’对应集{0}，’i’ 对应集{1, 4, 7, 10}，依次类推。使用字符到可变集的映射。另外，你如何保证集是经过排序的？</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre>1
 2
@@ -1466,7 +1466,7 @@ for (c &lt;- str<span class="preprocessor">.par</span>) frequencies(c) = frequen
     <link href="http://www.swanlinux.net/2014/10/18/scala_note_12/"/>
     <id>http://www.swanlinux.net/2014/10/18/scala_note_12/</id>
     <published>2014-10-18T06:42:16.000Z</published>
-    <updated>2015-04-09T19:06:05.520Z</updated>
+    <updated>2015-05-23T22:03:07.643Z</updated>
     <content type="html"><![CDATA[<p>\1. 编写函数 values(fun: (Int) => Int, low:Int, high: Int), 该函数输出一个集合，对应给定区间内给定函数的输入和输出。比如，values(x=> x * x, -5, 5)应该产生一个对偶的集合(-5, 25), (-4, 16), (-3, 9), …., (5, 25)。</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre>1
 2
@@ -1708,7 +1708,7 @@ for (c &lt;- str<span class="preprocessor">.par</span>) frequencies(c) = frequen
     <link href="http://www.swanlinux.net/2014/10/13/scala_note_11/"/>
     <id>http://www.swanlinux.net/2014/10/13/scala_note_11/</id>
     <published>2014-10-13T06:42:16.000Z</published>
-    <updated>2015-04-09T19:06:05.520Z</updated>
+    <updated>2015-05-23T22:03:07.643Z</updated>
     <content type="html"><![CDATA[<p>\1. 根据优先级规则， 3 + 4 -&gt; 5 和 3 -&gt; 4 + 5 是如何被求值的？</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre>1
 </pre></td><td class="code"><pre>在REPL中执行即可得到结果。都是从左至右执行
@@ -2410,7 +2410,7 @@ for (c &lt;- str<span class="preprocessor">.par</span>) frequencies(c) = frequen
     <link href="http://www.swanlinux.net/2014/09/14/hadoop_install/"/>
     <id>http://www.swanlinux.net/2014/09/14/hadoop_install/</id>
     <published>2014-09-14T05:02:16.000Z</published>
-    <updated>2015-04-09T19:06:05.518Z</updated>
+    <updated>2015-05-23T22:03:07.641Z</updated>
     <content type="html"><![CDATA[<h3 id="安装介绍">安装介绍</h3>
 <p>该集群安装6台机器，利用 DNS 服务做主机名解析， NFS 做免密码共享</p>
 <p>机器部署情况：</p>
@@ -2945,7 +2945,7 @@ chmod <span class="number">755</span> publish.sh
     <link href="http://www.swanlinux.net/2014/09/11/scala_note_10/"/>
     <id>http://www.swanlinux.net/2014/09/11/scala_note_10/</id>
     <published>2014-09-11T06:42:16.000Z</published>
-    <updated>2015-04-09T19:06:05.520Z</updated>
+    <updated>2015-05-23T22:03:07.642Z</updated>
     <content type="html"><![CDATA[<p>\1. java.awt.Rectangle类有两个很有用的方法translate和grow,但可惜的是像java.awt.geom.Ellipse2D这样的类没有。在Scala中，你可以解决掉这个问题。定义一个RenctangleLike特质,加入具体的translate和grow方法。提供任何你需要用来实现的抽象方法,以便你可以像如下代码这样混入该特质:</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre>1
 2
@@ -3118,7 +3118,7 @@ egg<span class="preprocessor">.grow</span>(<span class="number">10</span>,<span 
     <link href="http://www.swanlinux.net/2014/09/10/scala_note_9/"/>
     <id>http://www.swanlinux.net/2014/09/10/scala_note_9/</id>
     <published>2014-09-10T03:32:16.000Z</published>
-    <updated>2015-04-09T19:06:05.522Z</updated>
+    <updated>2015-05-23T22:03:07.643Z</updated>
     <content type="html"><![CDATA[<p>\1. 编写一小段Scala代码，将某个文件中的行倒转顺序（将最后一行作为第一行，一次类推）</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre>1
 2
@@ -3449,7 +3449,7 @@ object Test extends App
     <link href="http://www.swanlinux.net/2014/09/09/scala_note_8/"/>
     <id>http://www.swanlinux.net/2014/09/09/scala_note_8/</id>
     <published>2014-09-09T06:51:16.000Z</published>
-    <updated>2015-04-09T19:06:05.521Z</updated>
+    <updated>2015-05-23T22:03:07.643Z</updated>
     <content type="html"><![CDATA[<p>\1. 扩展入校的BankAccount类，新类CheckingAccount 对每次存款和取款都收取1美元的手续费</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre>1
 2
@@ -3950,7 +3950,7 @@ object Test extends App
     <link href="http://www.swanlinux.net/2014/09/09/scala_note_7/"/>
     <id>http://www.swanlinux.net/2014/09/09/scala_note_7/</id>
     <published>2014-09-09T03:40:16.000Z</published>
-    <updated>2015-04-09T19:06:05.521Z</updated>
+    <updated>2015-05-23T22:03:07.643Z</updated>
     <content type="html"><![CDATA[<p>\1. 编写示例程序，展示为什么<br>package com.horstmann.impatient<br>不同于<br>package com<br>package horstmann<br>package impatient</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre>1
 2
@@ -4250,7 +4250,7 @@ object TestMap7 {
     <link href="http://www.swanlinux.net/2014/09/08/scala_note_6/"/>
     <id>http://www.swanlinux.net/2014/09/08/scala_note_6/</id>
     <published>2014-09-08T05:56:16.000Z</published>
-    <updated>2015-04-09T19:06:05.521Z</updated>
+    <updated>2015-05-23T22:03:07.643Z</updated>
     <content type="html"><![CDATA[<p>\1. 编写一个Conversions对象，加入inchesToCentimeters、gallonsToLiters和milesToKilometers方法。 </p>
 <figure class="highlight"><table><tr><td class="gutter"><pre>1
 2
@@ -4567,7 +4567,7 @@ object <span class="type">TestApp</span>
     <link href="http://www.swanlinux.net/2014/09/08/scala_note_5/"/>
     <id>http://www.swanlinux.net/2014/09/08/scala_note_5/</id>
     <published>2014-09-08T02:56:16.000Z</published>
-    <updated>2015-04-09T19:06:05.521Z</updated>
+    <updated>2015-05-23T22:03:07.643Z</updated>
     <content type="html"><![CDATA[<p>\1. 改进5.1节的Counter类，让它不要在Int.MaxValue时变成负数。</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre>1
 2
@@ -5009,7 +5009,7 @@ object TestC {
     <link href="http://www.swanlinux.net/2014/09/08/scala_note_4/"/>
     <id>http://www.swanlinux.net/2014/09/08/scala_note_4/</id>
     <published>2014-09-07T18:13:16.000Z</published>
-    <updated>2015-04-09T19:06:05.521Z</updated>
+    <updated>2015-05-23T22:03:07.643Z</updated>
     <content type="html"><![CDATA[<p>\1.设置一个映射，其中包含你想要的一些装备，以及它们的价格。然后构建另一个映射，采用同一组键，但在价格上打9折。</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre>1
 2
@@ -5403,7 +5403,7 @@ object MapApp
     <link href="http://www.swanlinux.net/2014/09/05/scala_note_3/"/>
     <id>http://www.swanlinux.net/2014/09/05/scala_note_3/</id>
     <published>2014-09-05T15:13:16.000Z</published>
-    <updated>2015-04-09T19:06:05.521Z</updated>
+    <updated>2015-05-23T22:03:07.643Z</updated>
     <content type="html"><![CDATA[<p>\1. 编写一段代码，将a设置为一个n个随机整数的数组，要求随机数介于0和n之间。</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre>1
 2
@@ -5772,7 +5772,7 @@ object App
     <link href="http://www.swanlinux.net/2014/09/05/scala_note_2/"/>
     <id>http://www.swanlinux.net/2014/09/05/scala_note_2/</id>
     <published>2014-09-05T07:13:16.000Z</published>
-    <updated>2015-04-09T19:06:05.521Z</updated>
+    <updated>2015-05-23T22:03:07.643Z</updated>
     <content type="html"><![CDATA[<p>\1. 一个数字如果为正数，则它的signum为1；如果是负数，则signum为-1；如果是0，则signum为0.编写一个函数来计算这个值。</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre>1
 2
@@ -5966,7 +5966,7 @@ object App
     <link href="http://www.swanlinux.net/2014/09/05/scala_note_1/"/>
     <id>http://www.swanlinux.net/2014/09/05/scala_note_1/</id>
     <published>2014-09-05T05:13:16.000Z</published>
-    <updated>2015-04-09T19:06:05.520Z</updated>
+    <updated>2015-05-23T22:03:07.642Z</updated>
     <content type="html"><![CDATA[<p>\1. 在 Scala REPL 中键入3，然后按TAB键。有那些方法可以被应用？ </p>
 <figure class="highlight"><table><tr><td class="gutter"><pre>1
 2
@@ -6148,7 +6148,7 @@ scala&gt; str<span class="preprocessor">.dropRight</span>(<span class="number">2
     <link href="http://www.swanlinux.net/2014/04/11/vm_esxi_install/"/>
     <id>http://www.swanlinux.net/2014/04/11/vm_esxi_install/</id>
     <published>2014-04-11T15:13:16.000Z</published>
-    <updated>2015-04-09T19:06:05.523Z</updated>
+    <updated>2015-05-23T22:03:07.644Z</updated>
     <content type="html"><![CDATA[<h3 id="硬件环境">硬件环境</h3>
 <p>主板：华硕P8B75 <strong>板载Realtek RTL8111F千兆网卡</strong> 注意：RLT类型的网卡 VM默认安装不支持，需要重新打包安装（下面详细说明）<br>CPU: 英特尔 第三代酷睿 i5-3570K @ 3.40GHz<br>内存: 16 GB</p>
 <h3 id="用到的软件下载">用到的软件下载</h3>
