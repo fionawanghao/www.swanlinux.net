@@ -1,0 +1,608 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Linux系统中防火墙配置 | Swan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Nmred">
+    
+    <meta name="description" content="网络层防火墙的应用原理
+1.网络防火墙工作在TCP/IP的网络层
+
+2.iptables规则链
+
+3.iptables的三个表
+iptables缺省具有3个规则表
+1)Filter：用于设置包过滤
+Filter：INPUT、FORWARD、OUTPUT
+2)NAT：用于设置地址转换
+NAT：PRER">
+    
+    
+    
+    
+    <link rel="alternative" href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" title="Swan" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="Swan" title="Swan"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Swan">Swan</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+						<li><a href="/tags">标签</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:www.swanlinux.net">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2013/02/12/linux_firewall_setting/" title="Linux系统中防火墙配置" itemprop="url">Linux系统中防火墙配置</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.swanlinux.net" title="Nmred">Nmred</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2013-02-12T10:13:16.000Z" itemprop="datePublished">2月 12 2013</time>
+    更新日期:<time datetime="2015-04-09T19:06:05.519Z" itemprop="dateModified">4月 10 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#网络层防火墙的应用原理"><span class="toc-number">1.</span> <span class="toc-text">网络层防火墙的应用原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#防火墙应用实例"><span class="toc-number">2.</span> <span class="toc-text">防火墙应用实例</span></a></li></ol>
+		</div>
+		
+		<h3 id="网络层防火墙的应用原理">网络层防火墙的应用原理</h3>
+<p>1.网络防火墙工作在TCP/IP的网络层</p>
+<p><img src="/image/linux/linux-iptables-001-017.png" alt="linux-iptables-001-017"></p>
+<p>2.iptables规则链</p>
+<p><img src="/image/linux/linux-iptables-002-017.png" alt="linux-iptables-002-017"></p>
+<p>3.iptables的三个表</p>
+<p>iptables缺省具有3个规则表</p>
+<p>1)Filter：用于设置包过滤</p>
+<p>Filter：INPUT、FORWARD、OUTPUT</p>
+<p>2)NAT：用于设置地址转换</p>
+<p>NAT：PREROUTING、POSTROUTING、OUTPUT</p>
+<p>3)Mangle：用于设置网络流量整形等应用</p>
+<p>Mangle：PREROUTING、POSTROUTING、INPUT、OUTPUT和FORWARD</p>
+<p>4.查看iptables防火墙</p>
+<pre><code><span class="preprocessor"># iptables -t filter -L   ==&gt;iptables -L</span>
+<span class="preprocessor"># iptables -t nat –L </span>
+</code></pre><p><img src="/image/linux/linux-iptables-003-017.png" alt="linux-iptables-003-017"></p>
+<p>5.使用iptables脚本保存防火墙设置</p>
+<p>iptables脚本可以保存当前防火墙配置</p>
+<p>1)在保存防火墙当前配置前应先将原有配置进行备份</p>
+<p>/etc/sysconfig/iptables iptables.raw</p>
+<p>2)iptables脚本的save命令可以保存防火墙配置</p>
+<p>service iptables save</p>
+<p>3)配置内容将保存在“/etc/sysconfig/iptables”文件中，文件原有的内容将被覆盖</p>
+<p>6.iptables命令的使用</p>
+<p>1)iptables命令的操作对象包括</p>
+<p>a.规则表（table）由规则链的集合组成，不同的规则表用于实现不同类型的功能</p>
+<p>b.规则链（chain）由规则的集合组成，保存在规则表中；在规则表中不同的规则链代表了不同的数据包流向</p>
+<p>c.规则（rule）是最基本的设置项，用于对防火墙的策略进行设置；流经某个数据链的数据将按照先后顺序经过规则的“过滤”</p>
+<p>2)iptables命令查看规则表</p>
+<p>a.基本语法</p>
+<pre><code><span class="tag">iptables</span> <span class="attr_selector">[-t table]</span> <span class="tag">-</span><span class="attr_selector">[L]</span> <span class="attr_selector">[chain]</span> <span class="attr_selector">[options]</span>
+</code></pre><p>b.不指定表名称时查看filter表的内容</p>
+<pre><code><span class="preprocessor"># iptables -L</span>
+</code></pre><p>c.查看指定的规则表</p>
+<pre><code><span class="preprocessor"># iptables -t nat -L</span>
+</code></pre><p>3)清空表中的规则</p>
+<p>a.命令格式：</p>
+<pre><code><span class="tag">iptables</span> <span class="attr_selector">[-t table]</span> <span class="tag">-F</span> <span class="attr_selector">[chain]</span> <span class="attr_selector">[options]</span> –<span class="tag">X</span> <span class="attr_selector">[chain]</span>
+</code></pre><p>b.清空filter表中的所有规则</p>
+<pre><code><span class="preprocessor"># iptables -F</span>
+</code></pre><p>c.清空nat表中的所有规则</p>
+<pre><code><span class="preprocessor"># iptables -t nat –F</span>
+</code></pre><p>d.删除表中所有的自定义规则链</p>
+<pre><code><span class="id">#iptables</span> <span class="attr_selector">[-t table]</span> <span class="tag">-X</span>
+</code></pre><p>4)添加规则</p>
+<p>a.命令格式</p>
+<pre><code><span class="tag">iptables</span> <span class="attr_selector">[-t table]</span> <span class="tag">-A</span> <span class="tag">chain</span> <span class="tag">rule-specification</span> <span class="attr_selector">[options]</span>
+</code></pre><p>b.在INPUT规则链中添加规则，允许“eth0”网络接口中来自“192.168.1.0/24”子网的所有数据包</p>
+<pre><code><span class="preprocessor"># iptables -A INPUT -i eth0 -s 192.168.1.0/24 -j ACCEPT</span>
+</code></pre><p>5)删除规则</p>
+<p>a.命令格式</p>
+<pre><code><span class="tag">iptables</span> <span class="attr_selector">[-t table]</span> <span class="tag">-D</span> <span class="tag">chain</span> <span class="tag">rule-specification</span> <span class="attr_selector">[options]</span>
+</code></pre><p>b.删除规则的iptables命令与添加规则的命令格式类似</p>
+<p>c.删除INPUT规则表中已有的规则</p>
+<pre><code><span class="preprocessor"># iptables -D INPUT -i eth0 -s 192.168.1.0/24 -j ACCEPT</span>
+</code></pre><p>6)设置内置规则链的缺省策略</p>
+<p>a.命令格式</p>
+<pre><code><span class="tag">iptables</span> <span class="attr_selector">[-t table]</span> <span class="tag">-P</span> <span class="tag">chain</span> <span class="tag">target</span> <span class="attr_selector">[options]</span>
+</code></pre><p>b.只有内建规则链才能够设置“缺省策略”</p>
+<p>c.将INPUT规则链的缺省策略设置为“DROP”</p>
+<pre><code><span class="preprocessor"># iptables -P INPUT DROP</span>
+</code></pre><hr>
+<p>[扩展知识]</p>
+<p>网络OSI七层模型</p>
+<blockquote>
+<p>7层==&gt;应用层</p>
+<p>6层==&gt;表示层</p>
+<p>5层==&gt;会话层  //五六七层决定的数据的内容，压缩，加密，会话</p>
+<p>4层==&gt;传输层  //源端口和目标端口</p>
+<p>3层==&gt;网络层  //源ip和目标ip</p>
+<p>2层==&gt;数据链路层 //源mac和目标mac</p>
+<p>1层==&gt;物理层  //网线</p>
+</blockquote>
+<hr>
+<h3 id="防火墙应用实例">防火墙应用实例</h3>
+<p>1.利用iptables实现多个用户通过adsl共享上网,并且开机自拨号和配置iptables nat</p>
+<p>[实验原理]</p>
+<p>由于不知道公网WEB的网关而且公司内部的局域网和公网就不可能通信，那么一般是通过拨号会动态获取一个公网IP，当内部计算机和这个带防火墙的路由器链接时会用防火墙的POSTROUTING规则链将公司内部请求的实际IP转化成公网动态获取的IP，这时由公司内部发出的所有请求就是合法的IP了就可以上网了。</p>
+<p>[案例实验背景]</p>
+<p>A.本实验是模拟共享上网，提前预设adsl拨号上网后获取的动态IP为192.168.129.254</p>
+<p>B.模拟环境构架</p>
+<p>1)一台模拟公网的WEB服务器假设IP：192.168.129.1网关在模拟公网是不需要设定的。</p>
+<p>2)一台带防火墙的路由器(本实验其实是一台虚拟机，这个是2个网卡)</p>
+<p>3)至少一台模拟公司员工机器(这些是局域网)</p>
+<p>详细参见下图： </p>
+<p><img src="/image/linux/linux-iptables-004-017.png" alt="linux-iptables-004-017"></p>
+<p>[实验步骤]</p>
+<p>A.架设模拟公网的WEB服务器</p>
+<p>1)IP设置为192.168.129.1</p>
+<p>2)网关不要设置</p>
+<p>3)构建一个Apache服务器</p>
+<p>B.架设模拟公司内部员工机器</p>
+<p>1)IP设置为192.168.128.0/24</p>
+<p>2)网关：192.168.128.254</p>
+<p>C.架设带防火墙的路由器(在这里其实就是另一台VM)</p>
+<p>1)本机是两块网卡eth0/eth1</p>
+<blockquote>
+<p>eth0的IP：192.168.128.254(链接公司内部)<br>eth1的IP：192.168.129.254(公网动态获取的IP)</p>
+</blockquote>
+<p>2)开启linux的路由器功能</p>
+<pre><code><span class="preprocessor">#echo 1 &gt;/proc/sys/net/ipv4/ip_forward</span>
+</code></pre><p><img src="/image/linux/linux-iptables-005-017.png" alt="linux-iptables-005-017"></p>
+<p>D.在防火墙没有做任何操作是测试看看是否能通？</p>
+<p>测试方法在本环境下是，在公司内部机器上访问<a href="http://192.168.129.1/" target="_blank">http://192.168.129.1/</a></p>
+<p>肯定是不通的，因为WEB服务器中没有设置网关路由器肯定是不能通信的</p>
+<p>E.配置防火墙</p>
+<pre><code><span class="variable">#iptables</span> <span class="attribute">-t</span> nat <span class="attribute">-A</span>  PREROUTING <span class="attribute">-o</span> eth1 <span class="attribute">-j</span> MASQUERADE
+</code></pre><p>其中eth1是指防火墙中连接WEB的网卡，换句话就是公网的动态获取IP，由于实际中这个IP是动态变化的，所以这里使用端口自动转化技术。 </p>
+<p><img src="/image/linux/linux-iptables-006-017.png" alt="linux-iptables-006-017"></p>
+<p>F.测试上网</p>
+<p><a href="http://192.168.129.1/" target="_blank">http://192.168.129.1/</a></p>
+<p><img src="/image/linux/linux-iptables-007-017.png" alt="linux-iptables-007-017"></p>
+<p>2.只用一个公网IP架设服务器集群</p>
+<p>[实验原理]</p>
+<p>只有一个公网IP建立服务器集群，这样用带防火墙的路由器一个网卡链接公网IP，另一个链接局域网的所有的服务器，其中运用防火墙中的PREROUTING规则链将公网上访问的该公网IP转化成另一个网卡上的局域网IP，这样就实现了服务器集群。</p>
+<p>[案例实验背景]</p>
+<p>A.本实验是模拟服务器，提前假设有一个公网IP：192.168.128.254</p>
+<p>B.模拟环境构架</p>
+<p>1)一台模拟公网的个人计算机，假设IP：192.168.128.1(和假设一个网段为了是使其是互通的，实际中本来就是互通的)不设定网关就可以模拟一台公网计算机。</p>
+<p>2)一台带防火墙的路由器(本实验其实是一台虚拟机，这个是2个网卡)</p>
+<p>3)至少一台WEB服务器(这些是局域网)</p>
+<p>详细参见下图： </p>
+<p><img src="/image/linux/linux-iptables-008-017.png" alt="linux-iptables-008-017"></p>
+<p>[实验步骤]</p>
+<p>A.架设模拟公网的个人计算机</p>
+<p>1)IP设置为192.168.128.1</p>
+<p>2)网关不要设置</p>
+<p>B.架设模拟局域网内WEB服务器</p>
+<p>1)IP设置为192.168.129.1</p>
+<p>2)网关：192.168.129.254</p>
+<p>C.架设带防火墙的路由器(在这里其实就是另一台VM)</p>
+<p>1)本机是两块网卡eth0/eth1</p>
+<blockquote>
+<p>eth0的IP：192.168.128.254(公网分配的IP)<br>eth1的IP：192.168.129.254(链接局域网的IP)</p>
+</blockquote>
+<p>2)开启linux的路由器功能</p>
+<pre><code><span class="preprocessor">#echo 1 &gt;/proc/sys/net/ipv4/ip_forward</span>
+</code></pre><p>D.配置防火墙</p>
+<pre><code><span class="variable">#iptables</span> <span class="attribute">-t</span> nat <span class="attribute">-A</span>  PREROUTING <span class="attribute">-d</span> <span class="number">192.168</span><span class="number">.129</span><span class="number">.254</span> <span class="attribute">-j</span> DNAT –<span class="keyword">to</span> <span class="number">192.168</span><span class="number">.129</span><span class="number">.1</span>
+</code></pre><p>其中192.168.129.254是模拟公网IP也就是公网用户直接访问的IP地址，192.168.129.1是真正的局域网WEB服务器 </p>
+<p><img src="/image/linux/linux-iptables-009-017.png" alt="linux-iptables-009-017"></p>
+<p>E.测试上网</p>
+<p><a href="http://192.168.128.254/" target="_blank">http://192.168.128.254/</a></p>
+<p><img src="/image/linux/linux-iptables-010-017.png" alt="linux-iptables-010-017"></p>
+<p>3.通过防火墙禁止指定IP：192.168.128.1不能访问Apache</p>
+<p>以下的几个实验的环境结构如图： </p>
+<p><img src="/image/linux/linux-iptables-011-017.png" alt="linux-iptables-011-017"></p>
+<p>[实验步骤]</p>
+<p>1)在防火墙没有任何操作前测试WEB是否能正常使用</p>
+<p>如果配置正确是可以使用的 </p>
+<p><img src="/image/linux/linux-iptables-012-017.png" alt="linux-iptables-012-017"></p>
+<p>2)配置防火墙</p>
+<pre><code><span class="variable">#iptables</span> <span class="attribute">-t</span> filter <span class="attribute">-A</span> FORWARD <span class="attribute">-s</span> <span class="number">192.168</span><span class="number">.128</span><span class="number">.1</span> <span class="attribute">-d</span> <span class="number">192.168</span><span class="number">.129</span><span class="number">.1</span> <span class="attribute">-p</span> tcp –dport <span class="number">80</span> <span class="attribute">-j</span> DROP 
+</code></pre><p><img src="/image/linux/linux-iptables-013-017.png" alt="linux-iptables-013-017"></p>
+<p>4.禁止外网计算机192.168.128.1 ping到WEB服务器192.168.129.1，但允许WEB服务器ping通外网主机</p>
+<p>以下是实验的环境结构和上个实验一样</p>
+<p>[实验步骤]</p>
+<p>1)在设置防火墙前： </p>
+<p><img src="/image/linux/linux-iptables-014-017.png" alt="linux-iptables-014-017"></p>
+<p>2)设置防火墙 </p>
+<p><img src="/image/linux/linux-iptables-015-017.png" alt="linux-iptables-015-017"></p>
+<p>3)设置后ping</p>
+<p><img src="/image/linux/linux-iptables-016-017.png" alt="linux-iptables-016-017"></p>
+<p><img src="/image/linux/linux-iptables-017-017.png" alt="linux-iptables-017-017"></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/firewall/">firewall</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.swanlinux.net/2013/02/12/linux_firewall_setting/" data-title="Linux系统中防火墙配置 | Swan" data-tsina="1810958350" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2013/02/12/linux_squid/" title="Linux系统中配置代理服务器Squid">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Linux系统中配置代理服务器Squid</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2013/02/12/linux_shell_study_01/"  title="Linux 系统 Shell 编程一">
+ <strong>NEXT:</strong><br/> 
+ <span>Linux 系统 Shell 编程一
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#网络层防火墙的应用原理"><span class="toc-number">1.</span> <span class="toc-text">网络层防火墙的应用原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#防火墙应用实例"><span class="toc-number">2.</span> <span class="toc-text">防火墙应用实例</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/C 语言/" title="C 语言">C 语言<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/categories/linux/" title="linux">linux<sup>21</sup></a></li>
+		
+			<li><a href="/categories/php/" title="php">php<sup>5</sup></a></li>
+		
+			<li><a href="/categories/《C++ Primer Plus(第6版)》练习/" title="《C++ Primer Plus(第6版)》练习">《C++ Primer Plus(第6版)》练习<sup>2</sup></a></li>
+		
+			<li><a href="/categories/《unix 高级编程》-Note/" title="《unix 高级编程》-Note">《unix 高级编程》-Note<sup>9</sup></a></li>
+		
+			<li><a href="/categories/《快学scala》练习/" title="《快学scala》练习">《快学scala》练习<sup>16</sup></a></li>
+		
+			<li><a href="/categories/虚拟技术/" title="虚拟技术">虚拟技术<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05">五月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04">四月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10">十月 2014</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09">九月 2014</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04">四月 2014</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03">三月 2014</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02">二月 2014</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09">九月 2013</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05">五月 2013</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/02">二月 2013</a><span class="archive-list-count">20</span></li></ul>
+  </div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/C++/" title="C++">C++<sup>2</sup></a></li>
+		
+			<li><a href="/tags/GIT/" title="GIT">GIT<sup>1</sup></a></li>
+		
+			<li><a href="/tags/apache/" title="apache">apache<sup>1</sup></a></li>
+		
+			<li><a href="/tags/crontab at/" title="crontab at">crontab at<sup>1</sup></a></li>
+		
+			<li><a href="/tags/directory/" title="directory">directory<sup>1</sup></a></li>
+		
+			<li><a href="/tags/dns/" title="dns">dns<sup>1</sup></a></li>
+		
+			<li><a href="/tags/esxi/" title="esxi">esxi<sup>1</sup></a></li>
+		
+			<li><a href="/tags/extern/" title="extern">extern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/file io/" title="file io">file io<sup>3</sup></a></li>
+		
+			<li><a href="/tags/firewall/" title="firewall">firewall<sup>1</sup></a></li>
+		
+			<li><a href="/tags/ftp/" title="ftp">ftp<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hadoop/" title="hadoop">hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/tags/lvs/" title="lvs">lvs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/network/" title="network">network<sup>1</sup></a></li>
+		
+			<li><a href="/tags/newt/" title="newt">newt<sup>4</sup></a></li>
+		
+			<li><a href="/tags/nfs/" title="nfs">nfs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/process/" title="process">process<sup>4</sup></a></li>
+		
+			<li><a href="/tags/public/" title="public">public<sup>1</sup></a></li>
+		
+			<li><a href="/tags/quota/" title="quota">quota<sup>1</sup></a></li>
+		
+			<li><a href="/tags/raid lvm/" title="raid lvm">raid lvm<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<div style="float:left"><p> Hello ,I&#39;m Nmred. For now I&#39;m a phper. <br/>
+			Everything in order to facilitate</p></div>
+	 <div style="float:right">
+		<a target="_blank" href="http://weibo.com/u/1810958350?s=6uyXnP"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1810958350/614754d4/1.png"></a>
+	 </div>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/623713456" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/nmred" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://www.swanlinux.net" target="_blank" title="Nmred">Nmred</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    $('#toc.toc-aside').css('display', 'block');
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    $('#toc.toc-aside').css('display', 'none');
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','block');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"nmred"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fbc789c531e32acef9db0c8b33befe435' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+  </body>
+</html>

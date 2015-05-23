@@ -1,0 +1,509 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Linux 系统添加数据分区和 swap 分区 | Swan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Nmred">
+    
+    <meta name="description" content="添加硬盘分区的步骤
+1.固件检测识别(一般可以省略操作)
+2.内核驱动demag(一般可以省略操作)
+3.划分分区fdisk
+4.创建文件系统mkfs
+5.尝试挂载mount(一般可以省略操作)
+6.写入配置文件(/etc/fstab) 
+添加硬盘分区
+1、分区 fdisk
+查看硬盘分区：fdisk">
+    
+    
+    
+    
+    <link rel="alternative" href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" title="Swan" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="Swan" title="Swan"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Swan">Swan</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+						<li><a href="/tags">标签</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:www.swanlinux.net">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2013/02/12/linux_add_disk_swap/" title="Linux 系统添加数据分区和 swap 分区" itemprop="url">Linux 系统添加数据分区和 swap 分区</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.swanlinux.net" title="Nmred">Nmred</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2013-02-12T10:13:16.000Z" itemprop="datePublished">2月 12 2013</time>
+    更新日期:<time datetime="2015-04-09T19:06:05.518Z" itemprop="dateModified">4月 10 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#添加硬盘分区的步骤"><span class="toc-number">1.</span> <span class="toc-text">添加硬盘分区的步骤</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#添加硬盘分区"><span class="toc-number">2.</span> <span class="toc-text">添加硬盘分区</span></a></li></ol>
+		</div>
+		
+		<h3 id="添加硬盘分区的步骤">添加硬盘分区的步骤</h3>
+<p>1.固件检测识别(一般可以省略操作)</p>
+<p>2.内核驱动demag(一般可以省略操作)</p>
+<p>3.划分分区fdisk</p>
+<p>4.创建文件系统mkfs</p>
+<p>5.尝试挂载mount(一般可以省略操作)</p>
+<p>6.写入配置文件(/etc/fstab) </p>
+<h3 id="添加硬盘分区">添加硬盘分区</h3>
+<p>1、分区 fdisk</p>
+<p>查看硬盘分区：fdisk -l 硬盘设备名</p>
+<p>fdisk -l /dev/sda </p>
+<p><img src="/image/linux/linux-fdisk-001-011.png" alt="linux-fdisk-001-011"></p>
+<p><img src="/image/linux/linux-fdisk-002-011.png" alt="linux-fdisk-002-011"></p>
+<p><img src="/image/linux/linux-fdisk-003-011.png" alt="linux-fdisk-003-011"></p>
+<p>分区：fdisk 硬盘设备名</p>
+<blockquote>
+<p>-m帮助menu</p>
+<p>-p查看分区表print</p>
+<p>-n添加新分区new</p>
+<p>-d删除分区delete</p>
+<p>-t设置分区文件系统type   82-swap  83-ext</p>
+<p>-w保存退出write</p>
+<p>-q不保存退出quit </p>
+</blockquote>
+<p>扩展知识</p>
+<hr>
+<p>主分区primary partition</p>
+<p>扩展分区extended</p>
+<p>逻辑分区</p>
+<p>1、主分区和扩展分区只能有四个</p>
+<p>分多个分区：分三个主分区，一个扩展分区（剩余所有空间）</p>
+<p>2、扩展分区存放逻辑分区</p>
+<p>分区大小：+sizeM   +5120M </p>
+<hr>
+<p><img src="/image/linux/linux-fdisk-004-011.png" alt="linux-fdisk-004-011"></p>
+<p>2、格式化（创建文件系统）</p>
+<p>1)数据分区</p>
+<blockquote>
+<p>mkfs.ext3 分区名</p>
+<p>mkfs -t ext3 分区名</p>
+</blockquote>
+<p>2)swap分区</p>
+<blockquote>
+<p>mkswap 分区名 </p>
+</blockquote>
+<p><img src="/image/linux/linux-fdisk-005-011.png" alt="linux-fdisk-005-011"></p>
+<p>3、写入配置文件/etc/fstab     file system table</p>
+<pre><code>卷标(设备名)  挂载点  文件系统  设置  是否启动检测(<span class="number">01</span>)  检测顺序(<span class="number">012</span>)
+e2label                 /dev/sda1 
+/dev/sdb1               /blog                   ext3    defaults        <span class="number">1</span> <span class="number">2</span>
+/dev/sdb2               /backup                 ext3    defaults        <span class="number">1</span> <span class="number">2</span>
+/dev/sdb3               <span class="keyword">swap</span>                    <span class="keyword">swap</span>    defaults        <span class="number">0</span> <span class="number">0</span>
+</code></pre><p>4.当swap分区不够用在现有的硬盘上添加</p>
+<p>1)生成空数据文件：</p>
+<pre><code>   dd <span class="keyword">if</span>=<span class="regexp">/dev/zero</span> of=<span class="regexp">/root/test</span>.swap bs=<span class="number">1</span>M count=<span class="number">512</span>
+</code></pre><p>2)生成swap文件 </p>
+<pre><code>mkswap /root/test<span class="preprocessor">.swap</span>
+</code></pre><p><img src="/image/linux/linux-fdisk-006-011.png" alt="linux-fdisk-006-011"></p>
+<p>3)启用swap文件<br>    swapon  /root/test.swap </p>
+<p><img src="/image/linux/linux-fdisk-007-011.png" alt="linux-fdisk-007-011"></p>
+<p>扩展知识：</p>
+<p>1)查看内存信息free -m</p>
+<p>2)dd命令</p>
+<p>dd if=/dev/sda of=/dev/sdc(用于整盘备份，和cp相比可以拷贝运行中的文件)</p>
+<p>dd if=/dev/zero of=输出文件 bs=1024 count=512000 block size 数据块大小</p>
+<p>/dev/zero 往输出中写零</p>
+<p>/dev/null 黑洞，一般用于计划任务和shell脚本 </p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/swap fdisk/">swap fdisk</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.swanlinux.net/2013/02/12/linux_add_disk_swap/" data-title="Linux 系统添加数据分区和 swap 分区 | Swan" data-tsina="1810958350" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2013/02/12/linux_samba/" title="Linux 系统中文件共享之 Samba">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Linux 系统中文件共享之 Samba</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2013/02/12/linux_nfs/"  title="Linux 系统中文件共享之 NFS">
+ <strong>NEXT:</strong><br/> 
+ <span>Linux 系统中文件共享之 NFS
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#添加硬盘分区的步骤"><span class="toc-number">1.</span> <span class="toc-text">添加硬盘分区的步骤</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#添加硬盘分区"><span class="toc-number">2.</span> <span class="toc-text">添加硬盘分区</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/C 语言/" title="C 语言">C 语言<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/categories/linux/" title="linux">linux<sup>21</sup></a></li>
+		
+			<li><a href="/categories/php/" title="php">php<sup>5</sup></a></li>
+		
+			<li><a href="/categories/《C++ Primer Plus(第6版)》练习/" title="《C++ Primer Plus(第6版)》练习">《C++ Primer Plus(第6版)》练习<sup>2</sup></a></li>
+		
+			<li><a href="/categories/《unix 高级编程》-Note/" title="《unix 高级编程》-Note">《unix 高级编程》-Note<sup>9</sup></a></li>
+		
+			<li><a href="/categories/《快学scala》练习/" title="《快学scala》练习">《快学scala》练习<sup>16</sup></a></li>
+		
+			<li><a href="/categories/虚拟技术/" title="虚拟技术">虚拟技术<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05">五月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04">四月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10">十月 2014</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09">九月 2014</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04">四月 2014</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03">三月 2014</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02">二月 2014</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09">九月 2013</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05">五月 2013</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/02">二月 2013</a><span class="archive-list-count">20</span></li></ul>
+  </div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/C++/" title="C++">C++<sup>2</sup></a></li>
+		
+			<li><a href="/tags/GIT/" title="GIT">GIT<sup>1</sup></a></li>
+		
+			<li><a href="/tags/apache/" title="apache">apache<sup>1</sup></a></li>
+		
+			<li><a href="/tags/crontab at/" title="crontab at">crontab at<sup>1</sup></a></li>
+		
+			<li><a href="/tags/directory/" title="directory">directory<sup>1</sup></a></li>
+		
+			<li><a href="/tags/dns/" title="dns">dns<sup>1</sup></a></li>
+		
+			<li><a href="/tags/esxi/" title="esxi">esxi<sup>1</sup></a></li>
+		
+			<li><a href="/tags/extern/" title="extern">extern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/file io/" title="file io">file io<sup>3</sup></a></li>
+		
+			<li><a href="/tags/firewall/" title="firewall">firewall<sup>1</sup></a></li>
+		
+			<li><a href="/tags/ftp/" title="ftp">ftp<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hadoop/" title="hadoop">hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/tags/lvs/" title="lvs">lvs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/network/" title="network">network<sup>1</sup></a></li>
+		
+			<li><a href="/tags/newt/" title="newt">newt<sup>4</sup></a></li>
+		
+			<li><a href="/tags/nfs/" title="nfs">nfs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/process/" title="process">process<sup>4</sup></a></li>
+		
+			<li><a href="/tags/public/" title="public">public<sup>1</sup></a></li>
+		
+			<li><a href="/tags/quota/" title="quota">quota<sup>1</sup></a></li>
+		
+			<li><a href="/tags/raid lvm/" title="raid lvm">raid lvm<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<div style="float:left"><p> Hello ,I&#39;m Nmred. For now I&#39;m a phper. <br/>
+			Everything in order to facilitate</p></div>
+	 <div style="float:right">
+		<a target="_blank" href="http://weibo.com/u/1810958350?s=6uyXnP"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1810958350/614754d4/1.png"></a>
+	 </div>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/623713456" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/nmred" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://www.swanlinux.net" target="_blank" title="Nmred">Nmred</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    $('#toc.toc-aside').css('display', 'block');
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    $('#toc.toc-aside').css('display', 'none');
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','block');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"nmred"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fbc789c531e32acef9db0c8b33befe435' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+  </body>
+</html>

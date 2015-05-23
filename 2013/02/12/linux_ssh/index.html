@@ -1,0 +1,531 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Linux 文件共享之 SSH | Swan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Nmred">
+    
+    <meta name="description" content="SSH的服务程序启动及停止
+OpenSSH的服务程序名称是sshd
+1.sshd服务程序的启动脚本
+/etc/init.d/sshd
+sshd服务程序缺省状态为自动启动
+2.sshd服务的启动与停止
+启动服务程序
+service sshd start
+停止服务程序
+service sshd stop">
+    
+    
+    
+    
+    <link rel="alternative" href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" title="Swan" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="Swan" title="Swan"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Swan">Swan</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+						<li><a href="/tags">标签</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:www.swanlinux.net">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2013/02/12/linux_ssh/" title="Linux 文件共享之 SSH" itemprop="url">Linux 文件共享之 SSH</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.swanlinux.net" title="Nmred">Nmred</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2013-02-12T10:13:16.000Z" itemprop="datePublished">2月 12 2013</time>
+    更新日期:<time datetime="2015-04-09T19:06:05.519Z" itemprop="dateModified">4月 10 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#SSH的服务程序启动及停止"><span class="toc-number">1.</span> <span class="toc-text">SSH的服务程序启动及停止</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OpenSSH的典型用户登录"><span class="toc-number">2.</span> <span class="toc-text">OpenSSH的典型用户登录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基于密钥的SSH认证登录过程"><span class="toc-number">3.</span> <span class="toc-text">基于密钥的SSH认证登录过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#禁止root用户的SSH登录"><span class="toc-number">4.</span> <span class="toc-text">禁止root用户的SSH登录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SSH涉及到的常用命令"><span class="toc-number">5.</span> <span class="toc-text">SSH涉及到的常用命令</span></a></li></ol>
+		</div>
+		
+		<h3 id="SSH的服务程序启动及停止">SSH的服务程序启动及停止</h3>
+<p>OpenSSH的服务程序名称是sshd</p>
+<p>1.sshd服务程序的启动脚本</p>
+<p>/etc/init.d/sshd</p>
+<p>sshd服务程序缺省状态为自动启动</p>
+<p>2.sshd服务的启动与停止</p>
+<pre><code>启动服务程序
+service sshd <span class="operator"><span class="keyword">start</span>
+停止服务程序
+service sshd stop </span>
+</code></pre><h3 id="OpenSSH的典型用户登录">OpenSSH的典型用户登录</h3>
+<p>使用ssh命令登录SSH服务器</p>
+<pre><code><span class="preprocessor"># ssh root@192.168.1.2</span>
+</code></pre><p>1.首次登录SSH服务器</p>
+<p>为了建立加密的SSH连接需要用户在客户端确认服务器发来的RSA密钥 （输入yes）</p>
+<p>2.用户认证</p>
+<p>每次登录SSH服务器都需要输入正确的用户口令</p>
+<p>SSH登录使用的是SSH服务器主机中的用户帐号</p>
+<p>3.SSH的用户目录</p>
+<p>1)“.ssh”目录</p>
+<p>在SSH客户主机的用户宿主目录中，使用名为“.ssh”的目录保存用户的SSH客户端信息</p>
+<p>2)~/.ssh/</p>
+<p>a.  “.ssh”目录在用户首次进行SSH登录后自动建立</p>
+<p>b.   “known_hosts”文件用于保存当前用户所有登录过的SSH服务器的RSA密钥 </p>
+<p><img src="/image/linux/linux-ssh-001-013.png" alt="linux-ssh-001-013"></p>
+<p>[扩展知识]</p>
+<p>SSH密钥认证的原理</p>
+<p><img src="/image/linux/linux-ssh-002-013.png" alt="linux-ssh-002-013"></p>
+<h3 id="基于密钥的SSH认证登录过程">基于密钥的SSH认证登录过程</h3>
+<p>A、设置密钥认证的一般步骤<br>1.在SSH客户端生成用户的公钥和私钥对文件</p>
+<p>1)使用ssh-keygen命令生成密钥对<br>    $ssh-keygen -t rsa</p>
+<p>2)公钥和私钥文件</p>
+<p>ssh-keygen命令将在“.ssh”目录中生成公钥和私钥文件</p>
+<p>id_rsa是私钥文件，内容需要严格保密</p>
+<p>id_rsa.pub是公钥文件，可发布到SSH服务器中</p>
+<p><img src="/image/linux/linux-ssh-003-013.png" alt="linux-ssh-003-013"></p>
+<p>注意：提示输入密码  时什么也不要输入</p>
+<p>2.将SSH客户的公钥添加到SSH服务器中用户的认证文件中</p>
+<p>1)复制公钥文件</p>
+<p>2)将客户端中的用户公钥文件复制到SSH服务器中</p>
+<p>3)公钥文件的复制可使用软盘、U盘或网络</p>
+<p>ssh-copy-id -i id_rsa.pub 192.168.10.1</p>
+<p><img src="/image/linux/linux-ssh-004-013.png" alt="linux-ssh-004-013"></p>
+<p>4)最后在服务器的.ssh下把id_rsa.pub改名为authorized_keys </p>
+<p><img src="/image/linux/linux-ssh-005-013.png" alt="linux-ssh-005-013"></p>
+<p>3.验证密钥的认证</p>
+<p>B、SSH密钥认证过程</p>
+<p>基于密钥的用户认证过程</p>
+<p>1.用户使用ssh命令登录SSH服务器时，将使用客户机中的私钥与服务器中的公钥进行认证，认证成功后将允许用户登录</p>
+<p>2.密钥的认证过程是ssh命令与SSH服务器自动完成的</p>
+<p>3.用户登录过程中将不再提示输入用户口令 </p>
+<h3 id="禁止root用户的SSH登录">禁止root用户的SSH登录</h3>
+<p>为了提高Linux服务器的安全性，可以禁止root用户进行SSH登录</p>
+<pre><code>设置sshd_config文件
+<span class="preprocessor"># vi /etc/ssh/sshd_config</span>
+    PermitRootLogin no
+重新启动sshd服务程序
+<span class="preprocessor"># service sshd restart </span>
+</code></pre><p><img src="/image/linux/linux-ssh-006-013.png" alt="linux-ssh-006-013"></p>
+<p>再次登录SSH服务器时将不能使用root帐号进行登录</p>
+<h3 id="SSH涉及到的常用命令">SSH涉及到的常用命令</h3>
+<p>1.ssh命令</p>
+<p>ssh命令的两种格式</p>
+<blockquote>
+<p>格式1：ssh username@sshserver</p>
+<p>格式2：ssh -l username sshserver</p>
+</blockquote>
+<p>不指定用户名的ssh命令</p>
+<p>ssh命令中如果不指定用户名，将使用SSH客户机中当前用户的名字登录SSH服务器</p>
+<pre><code><span class="preprocessor"># ssh 192.168.1.2</span>
+</code></pre><p>2.scp命令</p>
+<p>1)scp命令可以实现SSH服务器与客户机之间的文件复制</p>
+<p>2)scp命令的格式类似于cp命令</p>
+<p>3)SSH服务器可以作为scp命令中的源文件或目标文件</p>
+<p>4)命令实例</p>
+<pre><code>将SSH服务器中的文件复制到客户机
+<span class="preprocessor">#scp root@192.168.1.2:/etc/passwd .</span>
+将客户机中的文件复制到SSH服务器
+<span class="preprocessor">#scp test mike@192.168.1.2:~</span>
+</code></pre><p>3.rsync命令</p>
+<p>1)rsync -e ssh -arv /mnt root@192.168.0.1:/mnt</p>
+<blockquote>
+<p>-v, –verbose      详细模式输出</p>
+<p>-q, –quiet        精简输出模式 </p>
+<p>-c, –checksum     强制对文件传输进行校验 </p>
+<p>-a, –archive      归档模式，并保持所有文件属性 </p>
+<p>-r, –recursive    对子目录以递归模式处理</p>
+</blockquote>
+<p>2)用rsync进行远程备份时，最好使用公钥认证的ssh方式和crontab来一起完成 </p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/sshd/">sshd</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.swanlinux.net/2013/02/12/linux_ssh/" data-title="Linux 文件共享之 SSH | Swan" data-tsina="1810958350" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2013/05/14/unix_note_file_io/" title="文件IO">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  文件IO</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2013/02/12/linux_squid/"  title="Linux系统中配置代理服务器Squid">
+ <strong>NEXT:</strong><br/> 
+ <span>Linux系统中配置代理服务器Squid
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#SSH的服务程序启动及停止"><span class="toc-number">1.</span> <span class="toc-text">SSH的服务程序启动及停止</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OpenSSH的典型用户登录"><span class="toc-number">2.</span> <span class="toc-text">OpenSSH的典型用户登录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基于密钥的SSH认证登录过程"><span class="toc-number">3.</span> <span class="toc-text">基于密钥的SSH认证登录过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#禁止root用户的SSH登录"><span class="toc-number">4.</span> <span class="toc-text">禁止root用户的SSH登录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SSH涉及到的常用命令"><span class="toc-number">5.</span> <span class="toc-text">SSH涉及到的常用命令</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/C 语言/" title="C 语言">C 语言<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/categories/linux/" title="linux">linux<sup>21</sup></a></li>
+		
+			<li><a href="/categories/php/" title="php">php<sup>5</sup></a></li>
+		
+			<li><a href="/categories/《C++ Primer Plus(第6版)》练习/" title="《C++ Primer Plus(第6版)》练习">《C++ Primer Plus(第6版)》练习<sup>2</sup></a></li>
+		
+			<li><a href="/categories/《unix 高级编程》-Note/" title="《unix 高级编程》-Note">《unix 高级编程》-Note<sup>9</sup></a></li>
+		
+			<li><a href="/categories/《快学scala》练习/" title="《快学scala》练习">《快学scala》练习<sup>16</sup></a></li>
+		
+			<li><a href="/categories/虚拟技术/" title="虚拟技术">虚拟技术<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05">五月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04">四月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10">十月 2014</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09">九月 2014</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04">四月 2014</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03">三月 2014</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02">二月 2014</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09">九月 2013</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05">五月 2013</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/02">二月 2013</a><span class="archive-list-count">20</span></li></ul>
+  </div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/C++/" title="C++">C++<sup>2</sup></a></li>
+		
+			<li><a href="/tags/GIT/" title="GIT">GIT<sup>1</sup></a></li>
+		
+			<li><a href="/tags/apache/" title="apache">apache<sup>1</sup></a></li>
+		
+			<li><a href="/tags/crontab at/" title="crontab at">crontab at<sup>1</sup></a></li>
+		
+			<li><a href="/tags/directory/" title="directory">directory<sup>1</sup></a></li>
+		
+			<li><a href="/tags/dns/" title="dns">dns<sup>1</sup></a></li>
+		
+			<li><a href="/tags/esxi/" title="esxi">esxi<sup>1</sup></a></li>
+		
+			<li><a href="/tags/extern/" title="extern">extern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/file io/" title="file io">file io<sup>3</sup></a></li>
+		
+			<li><a href="/tags/firewall/" title="firewall">firewall<sup>1</sup></a></li>
+		
+			<li><a href="/tags/ftp/" title="ftp">ftp<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hadoop/" title="hadoop">hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/tags/lvs/" title="lvs">lvs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/network/" title="network">network<sup>1</sup></a></li>
+		
+			<li><a href="/tags/newt/" title="newt">newt<sup>4</sup></a></li>
+		
+			<li><a href="/tags/nfs/" title="nfs">nfs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/process/" title="process">process<sup>4</sup></a></li>
+		
+			<li><a href="/tags/public/" title="public">public<sup>1</sup></a></li>
+		
+			<li><a href="/tags/quota/" title="quota">quota<sup>1</sup></a></li>
+		
+			<li><a href="/tags/raid lvm/" title="raid lvm">raid lvm<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<div style="float:left"><p> Hello ,I&#39;m Nmred. For now I&#39;m a phper. <br/>
+			Everything in order to facilitate</p></div>
+	 <div style="float:right">
+		<a target="_blank" href="http://weibo.com/u/1810958350?s=6uyXnP"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1810958350/614754d4/1.png"></a>
+	 </div>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/623713456" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/nmred" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://www.swanlinux.net" target="_blank" title="Nmred">Nmred</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    $('#toc.toc-aside').css('display', 'block');
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    $('#toc.toc-aside').css('display', 'none');
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','block');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"nmred"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fbc789c531e32acef9db0c8b33befe435' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+  </body>
+</html>

@@ -1,0 +1,660 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>《快学scala》第十二章 高阶函数 | Swan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Nmred">
+    
+    <meta name="description" content="\1. 编写函数 values(fun: (Int) =&gt; Int, low:Int, high: Int), 该函数输出一个集合，对应给定区间内给定函数的输入和输出。比如，values(x=&gt; x * x, -5, 5)应该产生一个对偶的集合(-5, 25), (-4, 16), (-3, 9),">
+    
+    
+    
+    
+    <link rel="alternative" href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" title="Swan" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="Swan" title="Swan"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Swan">Swan</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+						<li><a href="/tags">标签</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:www.swanlinux.net">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/10/18/scala_note_12/" title="《快学scala》第十二章 高阶函数" itemprop="url">《快学scala》第十二章 高阶函数</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.swanlinux.net" title="Nmred">Nmred</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-10-18T06:42:16.000Z" itemprop="datePublished">10月 18 2014</time>
+    更新日期:<time datetime="2015-04-09T19:06:05.520Z" itemprop="dateModified">4月 10 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+		</div>
+		
+		<p>\1. 编写函数 values(fun: (Int) => Int, low:Int, high: Int), 该函数输出一个集合，对应给定区间内给定函数的输入和输出。比如，values(x=> x * x, -5, 5)应该产生一个对偶的集合(-5, 25), (-4, 16), (-3, 9), …., (5, 25)。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+</pre></td><td class="code"><pre>object valueTest extends App {
+
+  def values<span class="function"><span class="params">(func: (Int) =&gt; Int, low: Int, high: Int)</span> = {
+    <span class="title">val</span> <span class="title">result</span> = <span class="params">(low to high)</span>.<span class="title">map</span><span class="params">(
+      p =&gt; {
+        (p, func(p))
+      }
+    )</span>;
+
+    <span class="title">result</span>
+  }
+
+  <span class="title">def</span> <span class="title">func</span><span class="params">(x: Int)</span> = {
+    <span class="title">x</span> * <span class="title">x</span>
+  }
+
+  <span class="title">values</span><span class="params">(func, <span class="number">1</span>, <span class="number">5</span>)</span>.<span class="title">foreach</span><span class="params">(item =&gt; {
+    println(item._1)
+    println(item._2)
+  })</span>
+}</span>
+</pre></td></tr></table></figure>
+
+<p>\2. 如何用 reduceLeft 得到数组中最大元素？</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="code"><pre><span class="class"><span class="keyword">object</span> <span class="title">reduceLeftTest</span> <span class="keyword">extends</span> <span class="title">App</span> {</span>
+  <span class="keyword">val</span> testData = (<span class="number">1</span> to <span class="number">10</span>).toArray
+
+  println(testData.reduceLeft((num1, num2) =&gt; {
+    <span class="keyword">if</span> (num1 &gt; num2) {
+      num1
+    } <span class="keyword">else</span> {
+      num2
+    }
+  }))
+}
+</pre></td></tr></table></figure>
+
+<p>\3. 用 to 和 reduceLeft 实现阶乘函数，不得使用循环和递归。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+</pre></td><td class="code"><pre><span class="class"><span class="keyword">object</span> <span class="title">produceTest</span> <span class="keyword">extends</span> <span class="title">App</span> {</span>
+  println((<span class="number">1</span> to <span class="number">10</span>).reduceLeft(_ * _))
+}
+</pre></td></tr></table></figure>
+
+<p>\4. 前一个实现需要处理一个特殊情况，即 n &lt; 1 的情况。展示如何用foldLeft来避免这个需要。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+</pre></td><td class="code"><pre><span class="class"><span class="keyword">object</span> <span class="title">produceTest</span> <span class="keyword">extends</span> <span class="title">App</span> {</span>
+  println((<span class="number">1</span> to -<span class="number">10</span>).foldLeft(<span class="number">1</span>)(_ * _))
+}
+</pre></td></tr></table></figure>
+
+<p>\5. 编写函数 largest(fun:(Int) =&gt; Int, inputs: Seq[Int]), 输出在给定输入序列中给定函数的最大值。举例来说，largest(x => 10 * x - x * x, 1 to 10) 应该返回 25，不得使用循环和递归。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="code"><pre><span class="class"><span class="keyword">object</span> <span class="title">largestTest</span> <span class="keyword">extends</span> <span class="title">App</span> {</span>
+  <span class="keyword">def</span> largest(func: (Int) =&gt; Int, inputs: Seq[Int]) = {
+    <span class="keyword">val</span> opResult = inputs.map(func(_))
+    opResult.max
+  }               
+
+  println(largest( x =&gt; <span class="number">10</span> * x - x * x, <span class="number">1</span> to <span class="number">10</span>))
+}
+</pre></td></tr></table></figure>
+
+<p>\6. 修改前一个函数，返回最大的输出对应的输入。举例来说，largestAt(fun: (Int) => Int, inputs: Seq[Int])应该返回5. 不得使用循环递归</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre></td><td class="code"><pre><span class="class"><span class="keyword">object</span> <span class="title">largestTest</span> <span class="keyword">extends</span> <span class="title">App</span> {</span>
+  <span class="keyword">def</span> largest(func: (Int) =&gt; Int, inputs: Seq[Int]) = {
+    <span class="keyword">val</span> opResult = inputs.map(item =&gt; {(item, func(item))})
+    <span class="keyword">val</span> max = opResult.reduceLeft((item1, item2) =&gt; {
+      <span class="keyword">if</span> (item1._2 &gt; item2._2) {
+        item1
+      } <span class="keyword">else</span> {
+        item2
+      }
+    })
+
+    max._1
+  } 
+  
+  println(largest( x =&gt; <span class="number">10</span> * x - x * x, <span class="number">1</span> to <span class="number">10</span>))
+}
+</pre></td></tr></table></figure>
+
+<p>\7. 要得到一个序列的对偶很容易，比如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+</pre></td><td class="code"><pre>    <span class="keyword">val</span> pairs = (i <span class="keyword">to</span> <span class="number">10</span>) zip (<span class="number">11</span> <span class="keyword">to</span> <span class="number">20</span>)
+</pre></td></tr></table></figure>
+
+<p>假定你想要对这个序列做某种操作—-比如，给对偶中的值求和。但你不能直接用：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+</pre></td><td class="code"><pre>    <span class="built_in">pairs</span>.map(_ + _)
+</pre></td></tr></table></figure>
+
+<p>函数 _ + _ 接收两个 Int 作为参数，而不是(Int, Int)对偶。编写函数 adjustToPair, 该函数接受一个类型为(Int, Int) =&gt; Int, 并返回一个等效的、可以以对偶作为参数的函数。举例来说就是： adjustToPair(_ * _)((6, 7))应得到42.</p>
+<p>然后用这个函数通过map计算出各个对偶的元素之和</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="code"><pre>object adjustToPairTest extends App {
+  def adjustToPair<span class="function"><span class="params">(fun: (Int, Int) =&gt; Int)(item: (Int, Int))</span> = {
+    <span class="title">fun</span><span class="params">(item._1, item._2)</span>
+  }
+
+  <span class="title">val</span> <span class="title">pairs</span> = <span class="params">(<span class="number">1</span> to <span class="number">10</span>)</span> <span class="title">zip</span> <span class="params">(<span class="number">11</span> to <span class="number">20</span>)</span>
+  <span class="title">pairs</span>.<span class="title">map</span><span class="params">(item =&gt; adjustToPair(_ + _)(item))</span>.<span class="title">foreach</span><span class="params">(println)</span>
+}</span>
+</pre></td></tr></table></figure>
+
+<p>\8. 在12.8节中，你看到了用于两组字符串数组的corresponds方法。做出一个方法的调用，让它帮我们判断字符串数组里的所有元素的长度是否和某个给定整数数组相对应。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="code"><pre><span class="class"><span class="keyword">object</span> <span class="title">correspondsTest</span> <span class="keyword">extends</span> <span class="title">App</span> {</span>
+  <span class="keyword">val</span> a = Array(<span class="string">"aaaaa"</span>, <span class="string">"bbbbbb"</span>, <span class="string">"ccc"</span>)
+  <span class="keyword">val</span> b = Array(<span class="string">"aaa"</span>, <span class="string">"bbb"</span>, <span class="string">"ccc"</span>)
+  <span class="keyword">val</span> c = Array(<span class="number">5</span>, <span class="number">6</span>, <span class="number">3</span>)
+
+  println(a.corresponds(c)(_.length == _))
+  println(b.corresponds(c)(_.length == _))
+}
+</pre></td></tr></table></figure>
+
+<p>\9. 不使用柯里化实现 corresponds 。 然后尝试从以前一个练习的代码来调用。你遇到什么问题？</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+</pre></td><td class="code"><pre>类型推断会有问题
+</pre></td></tr></table></figure>
+
+<p>\10. 实现一个 unless 控制抽象，工作机制类似 if， 但条件是反过来的。第一个参数需要是换名调用的参数吗？你需要柯里化吗？</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre></td><td class="code"><pre><span class="class"><span class="keyword">object</span> <span class="title">unlessTest</span> <span class="keyword">extends</span> <span class="title">App</span> {</span>
+  <span class="keyword">def</span> unless(condition: =&gt; Boolean)(block: =&gt; Unit) {
+    <span class="keyword">if</span> (!condition) {
+      block
+    }
+  }
+
+  <span class="keyword">val</span> n = <span class="number">10</span>;
+  unless(n == <span class="number">1</span>) {
+    println(n)
+  }
+}
+
+需要换名和柯里化
+</pre></td></tr></table></figure>
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/scala/">scala</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/《快学scala》练习/">《快学scala》练习</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.swanlinux.net/2014/10/18/scala_note_12/" data-title="《快学scala》第十二章 高阶函数 | Swan" data-tsina="1810958350" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/10/19/scala_note_13/" title="《快学scala》第十三章 集合">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  《快学scala》第十三章 集合</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/10/13/scala_note_11/"  title="《快学scala》第十一章 操作符">
+ <strong>NEXT:</strong><br/> 
+ <span>《快学scala》第十一章 操作符
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/C 语言/" title="C 语言">C 语言<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/categories/linux/" title="linux">linux<sup>21</sup></a></li>
+		
+			<li><a href="/categories/php/" title="php">php<sup>5</sup></a></li>
+		
+			<li><a href="/categories/《C++ Primer Plus(第6版)》练习/" title="《C++ Primer Plus(第6版)》练习">《C++ Primer Plus(第6版)》练习<sup>2</sup></a></li>
+		
+			<li><a href="/categories/《unix 高级编程》-Note/" title="《unix 高级编程》-Note">《unix 高级编程》-Note<sup>9</sup></a></li>
+		
+			<li><a href="/categories/《快学scala》练习/" title="《快学scala》练习">《快学scala》练习<sup>16</sup></a></li>
+		
+			<li><a href="/categories/虚拟技术/" title="虚拟技术">虚拟技术<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05">五月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04">四月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10">十月 2014</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09">九月 2014</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04">四月 2014</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03">三月 2014</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02">二月 2014</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09">九月 2013</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05">五月 2013</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/02">二月 2013</a><span class="archive-list-count">20</span></li></ul>
+  </div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/C++/" title="C++">C++<sup>2</sup></a></li>
+		
+			<li><a href="/tags/GIT/" title="GIT">GIT<sup>1</sup></a></li>
+		
+			<li><a href="/tags/apache/" title="apache">apache<sup>1</sup></a></li>
+		
+			<li><a href="/tags/crontab at/" title="crontab at">crontab at<sup>1</sup></a></li>
+		
+			<li><a href="/tags/directory/" title="directory">directory<sup>1</sup></a></li>
+		
+			<li><a href="/tags/dns/" title="dns">dns<sup>1</sup></a></li>
+		
+			<li><a href="/tags/esxi/" title="esxi">esxi<sup>1</sup></a></li>
+		
+			<li><a href="/tags/extern/" title="extern">extern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/file io/" title="file io">file io<sup>3</sup></a></li>
+		
+			<li><a href="/tags/firewall/" title="firewall">firewall<sup>1</sup></a></li>
+		
+			<li><a href="/tags/ftp/" title="ftp">ftp<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hadoop/" title="hadoop">hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/tags/lvs/" title="lvs">lvs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/network/" title="network">network<sup>1</sup></a></li>
+		
+			<li><a href="/tags/newt/" title="newt">newt<sup>4</sup></a></li>
+		
+			<li><a href="/tags/nfs/" title="nfs">nfs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/process/" title="process">process<sup>4</sup></a></li>
+		
+			<li><a href="/tags/public/" title="public">public<sup>1</sup></a></li>
+		
+			<li><a href="/tags/quota/" title="quota">quota<sup>1</sup></a></li>
+		
+			<li><a href="/tags/raid lvm/" title="raid lvm">raid lvm<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<div style="float:left"><p> Hello ,I&#39;m Nmred. For now I&#39;m a phper. <br/>
+			Everything in order to facilitate</p></div>
+	 <div style="float:right">
+		<a target="_blank" href="http://weibo.com/u/1810958350?s=6uyXnP"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1810958350/614754d4/1.png"></a>
+	 </div>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/623713456" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/nmred" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://www.swanlinux.net" target="_blank" title="Nmred">Nmred</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    $('#toc.toc-aside').css('display', 'block');
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    $('#toc.toc-aside').css('display', 'none');
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','block');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"nmred"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fbc789c531e32acef9db0c8b33befe435' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+  </body>
+</html>

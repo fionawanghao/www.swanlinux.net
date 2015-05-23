@@ -1,0 +1,908 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>系统数据文件和信息 | Swan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Nmred">
+    
+    <meta name="description" content="口令文件
+POSIX.1 只定义了两个获取口令文件项的函数，在给出用户登录名或数值用户 ID 后，这两个函数就能查询相关项。
+结构：
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+struct {
+	char *pw_name;   // 用户">
+    
+    
+    
+    
+    <link rel="alternative" href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" title="Swan" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="Swan" title="Swan"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Swan">Swan</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+						<li><a href="/tags">标签</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:www.swanlinux.net">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2013/05/14/unix_note_file_state/" title="系统数据文件和信息" itemprop="url">系统数据文件和信息</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.swanlinux.net" title="Nmred">Nmred</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2013-05-14T10:13:16.000Z" itemprop="datePublished">5月 14 2013</time>
+    更新日期:<time datetime="2015-04-09T19:06:05.522Z" itemprop="dateModified">4月 10 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#口令文件"><span class="toc-number">1.</span> <span class="toc-text">口令文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#阴影口令"><span class="toc-number">2.</span> <span class="toc-text">阴影口令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#组文件"><span class="toc-number">3.</span> <span class="toc-text">组文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#登陆账户记录"><span class="toc-number">4.</span> <span class="toc-text">登陆账户记录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#系统标识"><span class="toc-number">5.</span> <span class="toc-text">系统标识</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#时间和日期例程"><span class="toc-number">6.</span> <span class="toc-text">时间和日期例程</span></a></li></ol>
+		</div>
+		
+		<h3 id="口令文件">口令文件</h3>
+<p>POSIX.1 只定义了两个获取口令文件项的函数，在给出用户登录名或数值用户 ID 后，这两个函数就能查询相关项。</p>
+<p>结构：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+</pre></td><td class="code"><pre><span class="keyword">struct</span> {
+	<span class="keyword">char</span> *pw_name;   <span class="comment">// 用户名</span>
+	<span class="keyword">char</span> *pw_passwd; <span class="comment">// 加密口令</span>
+	uid_t pw_uid;    <span class="comment">// 数值用户ID</span>
+	gid_t pw_gid;    <span class="comment">// 数值组ID</span>
+	<span class="keyword">char</span> *pw_gecos;  <span class="comment">// 注释字段</span>
+	<span class="keyword">char</span> *pw_dir;    <span class="comment">// 初始化工作目录</span>
+	<span class="keyword">char</span> *pw_shell;  <span class="comment">// 初始shell</span>
+	<span class="keyword">char</span> *pw_class;  <span class="comment">// 用户访问类</span>
+	time_t pw_change;<span class="comment">// 下次更改口令时间</span>
+	time_t pw_expire;<span class="comment">// 账户到期时间</span>
+};
+
+<span class="preprocessor">#include &lt;pwd.h&gt;</span>
+
+<span class="keyword">struct</span> passwd *getpwuid(uid_t uid);
+
+<span class="keyword">struct</span> passwd *getpwnam(<span class="keyword">const</span> <span class="keyword">char</span> *name);
+
+<span class="comment">// 两个函数返回值：若成功则返回指针，若出错则返回 NULL</span>
+</pre></td></tr></table></figure>
+
+<p>这两个函数都返回一个指向 passwd 结构的指针，该结构已由这两个函数在执行时填入信息，passwd结构通常是相关函数内的静态变量，只要调用相关函数，其内容就会被重写。</p>
+<p>下列三个函数则可用于获取整个口令文件：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;pwd.h&gt;</span>
+
+<span class="keyword">struct</span> passswd *getpwent(<span class="keyword">void</span>);
+
+<span class="comment">// 返回值：若成功则返回指针，若出错或到达文件结尾则返回 NULL</span>
+
+<span class="keyword">void</span> setpwent(<span class="keyword">void</span>);
+
+<span class="keyword">void</span> endpwent(<span class="keyword">void</span>);
+</pre></td></tr></table></figure>
+
+<p>调用 getpwent时，它返回口令文件中的下一个记录项，函数setpwent 反绕它所使用的文件，endpwent 则关闭这些文件。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;stddef.h&gt;</span>
+<span class="preprocessor">#include &lt;string.h&gt;</span>
+<span class="preprocessor">#include &lt;stdio.h&gt;</span>
+<span class="preprocessor">#include &lt;pwd.h&gt;</span>
+
+<span class="comment">//struct passwd * getpwnam(const char *name)</span>
+<span class="comment">//{</span>
+<span class="comment">//  struct passwd *ptr;</span>
+<span class="comment">//</span>
+<span class="comment">//  setpwent();</span>
+<span class="comment">//  while ((ptr = getpwent()) !== NULL) {</span>
+<span class="comment">//      if (strcmp(name, ptr-&gt;pw_name) == 0) {</span>
+<span class="comment">//          break;  </span>
+<span class="comment">//      }</span>
+<span class="comment">//  }</span>
+<span class="comment">//</span>
+<span class="comment">//  endpwent();</span>
+<span class="comment">//  return ptr;</span>
+<span class="comment">//}</span>
+<span class="comment">//</span>
+<span class="keyword">int</span> main(<span class="keyword">void</span>)
+{
+	<span class="keyword">struct</span> passwd *swan;
+	setpwent();
+	<span class="keyword">while</span> ((swan = getpwent()) != NULL) {
+		<span class="built_in">printf</span>(<span class="string">"system user: %s\n"</span>, swan-&gt;pw_name);
+	}
+
+	endpwent();
+	<span class="keyword">return</span> <span class="number">0</span>;
+}
+</pre></td></tr></table></figure>
+
+<h3 id="阴影口令">阴影口令</h3>
+<p>加密口令是经单向加密算法处理过的用户口令副本，因此此算法是单向的，所以不能从加密口令猜测到原来的口令。</p>
+<p>在 linux 中，与访问口令文件的一组函数类似，有另一组函数可用于访问阴影口令文件。</p>
+<p>结构：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+</pre></td><td class="code"><pre><span class="keyword">struct</span> spwd {
+	<span class="keyword">char</span> *sp_namp; <span class="comment">// 用户登录名</span>
+	<span class="keyword">char</span> *sp_pwdp; <span class="comment">// 加密口令</span>
+	<span class="keyword">int</span> sp_lstchg; <span class="comment">// 上次更改口令以来经过的时间</span>
+	<span class="keyword">int</span> sp_min;  <span class="comment">// 经过多少天后允许修改</span>
+	<span class="keyword">int</span> sp_max;  <span class="comment">// 要求更改尚余天数</span>
+	<span class="keyword">int</span> sp_warn; <span class="comment">// 到期告警天数</span>
+	<span class="keyword">int</span> sp_inact; <span class="comment">// 账户不活动之前的尚余天数</span>
+	<span class="keyword">int</span> sp_expire; <span class="comment">// 账户到期天数</span>
+	<span class="keyword">unsigned</span> <span class="keyword">int</span> sp_flag; <span class="comment">// 保留</span>
+}
+
+<span class="preprocessor">#include &lt;shadow.h&gt;</span>
+
+<span class="keyword">struct</span> spwd *getspnam(<span class="keyword">const</span> <span class="keyword">char</span> *name);
+<span class="keyword">struct</span> spwd *getspent(<span class="keyword">void</span>);
+
+<span class="comment">// 两个函数返回值：若成功则返回指针，若出错则返回NULL</span>
+
+<span class="keyword">void</span> setspent(<span class="keyword">void</span>);
+<span class="keyword">void</span> endspent(<span class="keyword">void</span>);
+</pre></td></tr></table></figure>
+
+<h3 id="组文件">组文件</h3>
+<p>UNIX组文件的结构，该结构在<grp.h>中定义：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+</pre></td><td class="code"><pre><span class="keyword">struct</span> {
+	<span class="keyword">char</span> *gr_name;  <span class="comment">//组名</span>
+	<span class="keyword">char</span> *gr_passwd; <span class="comment">//加密口令</span>
+	<span class="keyword">int</span> gr_gid;  <span class="comment">//数值组ID</span>
+	<span class="keyword">char</span> **grmem; <span class="comment">//指向各个用户名的指针数组	</span>
+};
+</pre></td></tr></table></figure>
+
+<p>可以用下列两个函数查看组名和数值组ID:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;grp.h&gt;</span>
+<span class="keyword">struct</span> <span class="keyword">group</span> *getgrgid(gid_t gid);
+<span class="keyword">struct</span> <span class="keyword">group</span> getgrnam(<span class="keyword">const</span> <span class="keyword">char</span> *name);
+
+<span class="comment">// 两个函数返回值：若成功则返回指针，若出错则返回NULL</span>
+</pre></td></tr></table></figure>
+
+<p>如同对口令文件进行操作的函数一样，这两个函数通常也返回指向一个静态变量的指针，在每次调用时都重写该静态变量。</p>
+<p>如果需要搜索整个组文件，则需要使用另外几个函数，下列三个函数类似于针对口令文件的三个函数。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;grp.h&gt;</span>
+
+<span class="keyword">struct</span> <span class="keyword">group</span> *getgrenet(<span class="keyword">void</span>);
+
+<span class="comment">// 返回值：若成功则返回指针，若出错或到达文件结尾则返回NULL</span>
+
+<span class="keyword">void</span> setgrent(<span class="keyword">void</span>);
+<span class="keyword">void</span> endgrent(<span class="keyword">void</span>);
+</pre></td></tr></table></figure>
+
+<p>setgrent函数打开组文件并反绕它，getrent函数从组文件中读下一个记录，如若该文件尚未打开它则先打开它，endgrent函数关闭组文件。</p>
+<p>使用附加组ID的有点是不必再显式地经常更改组，一个用户会参与多个项目，因此也就要同时属于多个组，此类情况是经常有的。</p>
+<p>为了获取和设置附加组ID，提供了下列三个函数：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;unistd.h&gt;</span>
+
+<span class="keyword">int</span> getgroups(<span class="keyword">int</span> gidsetsize, gid_t grouplist[]);
+
+<span class="comment">// 返回值：若成功则返回附加组ID数，若出错则返回 -1</span>
+
+<span class="preprocessor">#include &lt;grp.h&gt; <span class="comment">// on linux and solaris</span></span>
+<span class="preprocessor">#include &lt;unistd.h&gt; <span class="comment">// on freebsd and macos</span></span>
+
+<span class="keyword">int</span> setgroups(<span class="keyword">int</span> ngroups, <span class="keyword">const</span> gid_t grouplist[]);
+
+<span class="keyword">int</span> intgroups(<span class="keyword">const</span> <span class="keyword">char</span> *username, git_t basegid);
+</pre></td></tr></table></figure>
+
+<p>作为一个特例，如若 gidsetsize 为 0, 则函数只返回附加组 ID数， 而对数组 grouplist 则不作修改.</p>
+<p>setgroups 可由超级用户调用以便调用进程设置附加组 ID表，grouplist 是组 ID 数组，而 ngroups 指定了数组中的元素个数， ngroups 的值不能大于 NGROUPS_MAX.</p>
+<p>initgroups 函数调用 setgroups ，initgroups 读取整个组文件，然后对 username 确定组的成员关系，然后调用 setgroups ，以便为该用户初始化附加组 ID 表.</p>
+<h3 id="登陆账户记录">登陆账户记录</h3>
+<p>大多数 UNIX 系统都提供下列两个数据文件：utmp 文件，它记录当前登录进系统的各个用； wtmp 文件，它跟踪各个登录和注销事件.</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+</pre></td><td class="code"><pre>struct utmp {
+	char ut_line[<span class="number">8</span>]; // tty line: <span class="string">"ttyd0"</span>,<span class="string">'ttyp0'</span><span class="keyword">...</span>
+	char ut_name[<span class="number">8</span>]; // login name
+	long ut_time;	 // seconds since epoch
+}
+</pre></td></tr></table></figure>
+
+<p>登录时， login 程序填写此类型结构，然后将其写入到 utmp 文件中，同时也将其填写到 wtmp 文件中。注销时，init进程将 utmp 文件中相应的记录檫除，并将一个新记录添写到 wtmp文件中，在 wtmp 文件的注销记录中，将 ut_name 字段清 0, 在系统重启时，以及更改系统时间和日期的前后，都在 wtmp 文件中添写特殊的记录项。</p>
+<h3 id="系统标识">系统标识</h3>
+<p>uname 函数，它返回与当前主机和操作系统有关的信息</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;sys/utsname.h&gt;</span>
+<span class="keyword">int</span> uname(<span class="keyword">struct</span> utsname *name);
+
+<span class="comment">// 返回值: 若成功返回非负值，若出错则返回 -1</span>
+</pre></td></tr></table></figure>
+
+<p>通过该函数的参数向其传递一个 utsname 结构的地址，然后该函数填写此结构.</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="code"><pre>struct utsname {
+	<span class="value">char</span> sysname<span class="attr_selector">[]</span>; <span class="comment">// 操作系统的名称</span>
+	<span class="value">char</span> nodename<span class="attr_selector">[]</span>; <span class="comment">// 节点名称</span>
+	<span class="value">char</span> release<span class="attr_selector">[]</span>; <span class="comment">// 当前系统的 release 版本</span>
+	<span class="value">char</span> version<span class="attr_selector">[]</span>; <span class="comment">// 当前版本</span>
+	<span class="value">char</span> machine<span class="attr_selector">[]</span>; <span class="comment">// 硬件平台	</span>
+}
+</pre></td></tr></table></figure>
+
+<p>BSD 派生的系统提供了 gethostname 函数，它只返回主机名，该名字通常就是 TPC/IP 网络上主机的名字.</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;unistd.h&gt;</span>
+
+<span class="keyword">int</span> gethostname(<span class="keyword">char</span> *name, <span class="keyword">int</span> namelen);
+
+<span class="comment">// 返回值：若成功则返回 0，若出错则返回 -1</span>
+</pre></td></tr></table></figure>
+
+<p>现在 gethostname 函数已经定义为 POSIX.1 的一部分，它指定最大主机名长度是 HOST_NAME_MAX.</p>
+<h3 id="时间和日期例程">时间和日期例程</h3>
+<p>Unix 在时间日期方面和其他操作系统的区别是：</p>
+<ul>
+<li>以国际标准时间而非本地时间计时；</li>
+<li>可以自动进行转换，例如夏时制；</li>
+<li>将时间和日期作为一个量值保存</li>
+</ul>
+<p>time 函数返回时间和日期</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;time.h&gt;</span>
+time_t time(time_t *calptr)
+
+<span class="comment">// 返回值：若成功则返回时间值，若出错则返回 -1</span>
+</pre></td></tr></table></figure>
+
+<p>时间总是作为函数返回，如果参数不为空，则时间值也存放在由 calptr 指向的单元内。</p>
+<p>与 time 函数相比，gettimeofday提供了更高的分辨率</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;sys/time.h&gt;</span>
+<span class="keyword">int</span> gettimeofday(<span class="keyword">struct</span> timeval *<span class="keyword">restrict</span> tp, <span class="keyword">void</span> *<span class="keyword">restrict</span> tzp);
+
+<span class="comment">// 返回值，总是返回 0</span>
+</pre></td></tr></table></figure>
+
+<p>该函数作为XSI 扩展定义在 Single UNIX Specification 中， tzp的唯一合法值是 NULL, 其他值则将产生不确定的结果。</p>
+<p>gettimeofday 函数返回的 timeval 结构如下:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+</pre></td><td class="code"><pre><span class="keyword">struct</span> timeval {
+	time_t tv_sec; <span class="comment">// 秒</span>
+	<span class="keyword">long</span> tv_usec; <span class="comment">// 微秒	</span>
+}
+</pre></td></tr></table></figure>
+
+<p><img src="/image/unix_note/unix_note_001_001.png" alt="各个时间函数之间的关系"></p>
+<p>两个函数 localtime 和 gmtime 将日历时间转化成以年、月、日、时、分、秒、周日表示的时间， tm 结构如下:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="code"><pre><span class="keyword">struct</span> tm {
+	<span class="keyword">int</span> tm_sec;
+	<span class="keyword">int</span> tm_min;
+	<span class="keyword">int</span> tm_hour;
+	<span class="keyword">int</span> tm_mday;
+	<span class="keyword">int</span> tm_mon;
+	<span class="keyword">int</span> tm_year;
+	<span class="keyword">int</span> tm_wday;
+	<span class="keyword">int</span> tm_yday;
+	<span class="keyword">int</span> tm_isdst;
+}
+</pre></td></tr></table></figure>
+
+<p>秒可以超过 59 的理由是可以表示闰秒，如果夏时制生效，则夏时制标志值为正，如果为非夏时制时间，则该标志值为 0；如果此信息不可用，则其值为负。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;time.h&gt;</span>
+<span class="keyword">struct</span> tm *gmtime(<span class="keyword">const</span> time_t *calptr);
+<span class="keyword">struct</span> tm *localtime(<span class="keyword">const</span> time_t *calptr);
+
+<span class="comment">// 两个函数返回值：指向 tm 结构的指针</span>
+</pre></td></tr></table></figure>
+
+<p>localtime 和 gmtime 之间的区别是：localtime 将日历时间转换成本地时间，而 gmtime 则将日历时间转换成国际标准时间的年、月、日、分、秒、周日。</p>
+<p>函数 mktime 以本地时间的年、月、日等作为参数，将其转换为 time_t 值</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;time.h&gt;</span>
+
+time_t mktime(<span class="keyword">struct</span> tm *tmptr);
+
+<span class="comment">// 返回值：若成功则返回日历时间，若出错则返回 -1</span>
+</pre></td></tr></table></figure>
+
+<p>asctime 和 ctime 函数产生 26 字节的字符串如：</p>
+<blockquote>
+<p>Tue Feb 10 18:27:38 2014\n\0</p>
+</blockquote>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;time.h&gt;</span>
+
+<span class="keyword">char</span> *asctime(<span class="keyword">const</span> <span class="keyword">struct</span> tm *tmptr);
+
+<span class="keyword">char</span> *ctime(<span class="keyword">const</span> time_t *calptr);
+
+<span class="comment">// 两个函数返回值：指向以 null 结尾的字符串的指针</span>
+</pre></td></tr></table></figure>
+
+<p>asctime 的参数是指向年、月、日等字符串的指针，而 ctime 的参数则是指向日历时间的指针。</p>
+<p>最后一个时间函数 strftime:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;time.h&gt;</span>
+size_t strftime(<span class="keyword">char</span> *<span class="keyword">restrict</span> buf, size_t maxsize,
+				<span class="keyword">const</span> <span class="keyword">char</span> *<span class="keyword">restrict</span> format,
+				<span class="keyword">const</span> <span class="keyword">struct</span> tm *<span class="keyword">restrict</span> tmptr);
+<span class="comment">// 返回值：若有空间返回存入数组的字符串，否则返回 0</span>
+</pre></td></tr></table></figure>
+
+<p>最后一个参数是要格式化的时间值，有一个指向 tm 结构的指针指定，格式化结果存放在一个长度为 maxsize 个字符的 buf 数组中，如果 buf 长度足以存放格式化结果及一个 null 终止符，则该函数返回在 buf 中存放的字符数，否则该函数返回 0.</p>
+<p>对于常量 TZ 会影响 localtime, mktime, ctime 和strftime 四个函数,如果定义了则其值代替系统默认值，否则使用国际标准时间 UTC.</p>
+<p>(完)</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/file io/">file io</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/《unix 高级编程》-Note/">《unix 高级编程》-Note</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.swanlinux.net/2013/05/14/unix_note_file_state/" data-title="系统数据文件和信息 | Swan" data-tsina="1810958350" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2013/05/14/c_extern/" title="C 语言中 extern 关键字详解">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  C 语言中 extern 关键字详解</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2013/05/14/unix_note_file_io/"  title="文件IO">
+ <strong>NEXT:</strong><br/> 
+ <span>文件IO
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#口令文件"><span class="toc-number">1.</span> <span class="toc-text">口令文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#阴影口令"><span class="toc-number">2.</span> <span class="toc-text">阴影口令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#组文件"><span class="toc-number">3.</span> <span class="toc-text">组文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#登陆账户记录"><span class="toc-number">4.</span> <span class="toc-text">登陆账户记录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#系统标识"><span class="toc-number">5.</span> <span class="toc-text">系统标识</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#时间和日期例程"><span class="toc-number">6.</span> <span class="toc-text">时间和日期例程</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/C 语言/" title="C 语言">C 语言<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/categories/linux/" title="linux">linux<sup>21</sup></a></li>
+		
+			<li><a href="/categories/php/" title="php">php<sup>5</sup></a></li>
+		
+			<li><a href="/categories/《C++ Primer Plus(第6版)》练习/" title="《C++ Primer Plus(第6版)》练习">《C++ Primer Plus(第6版)》练习<sup>2</sup></a></li>
+		
+			<li><a href="/categories/《unix 高级编程》-Note/" title="《unix 高级编程》-Note">《unix 高级编程》-Note<sup>9</sup></a></li>
+		
+			<li><a href="/categories/《快学scala》练习/" title="《快学scala》练习">《快学scala》练习<sup>16</sup></a></li>
+		
+			<li><a href="/categories/虚拟技术/" title="虚拟技术">虚拟技术<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05">五月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04">四月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10">十月 2014</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09">九月 2014</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04">四月 2014</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03">三月 2014</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02">二月 2014</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09">九月 2013</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05">五月 2013</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/02">二月 2013</a><span class="archive-list-count">20</span></li></ul>
+  </div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/C++/" title="C++">C++<sup>2</sup></a></li>
+		
+			<li><a href="/tags/GIT/" title="GIT">GIT<sup>1</sup></a></li>
+		
+			<li><a href="/tags/apache/" title="apache">apache<sup>1</sup></a></li>
+		
+			<li><a href="/tags/crontab at/" title="crontab at">crontab at<sup>1</sup></a></li>
+		
+			<li><a href="/tags/directory/" title="directory">directory<sup>1</sup></a></li>
+		
+			<li><a href="/tags/dns/" title="dns">dns<sup>1</sup></a></li>
+		
+			<li><a href="/tags/esxi/" title="esxi">esxi<sup>1</sup></a></li>
+		
+			<li><a href="/tags/extern/" title="extern">extern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/file io/" title="file io">file io<sup>3</sup></a></li>
+		
+			<li><a href="/tags/firewall/" title="firewall">firewall<sup>1</sup></a></li>
+		
+			<li><a href="/tags/ftp/" title="ftp">ftp<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hadoop/" title="hadoop">hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/tags/lvs/" title="lvs">lvs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/network/" title="network">network<sup>1</sup></a></li>
+		
+			<li><a href="/tags/newt/" title="newt">newt<sup>4</sup></a></li>
+		
+			<li><a href="/tags/nfs/" title="nfs">nfs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/process/" title="process">process<sup>4</sup></a></li>
+		
+			<li><a href="/tags/public/" title="public">public<sup>1</sup></a></li>
+		
+			<li><a href="/tags/quota/" title="quota">quota<sup>1</sup></a></li>
+		
+			<li><a href="/tags/raid lvm/" title="raid lvm">raid lvm<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<div style="float:left"><p> Hello ,I&#39;m Nmred. For now I&#39;m a phper. <br/>
+			Everything in order to facilitate</p></div>
+	 <div style="float:right">
+		<a target="_blank" href="http://weibo.com/u/1810958350?s=6uyXnP"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1810958350/614754d4/1.png"></a>
+	 </div>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/623713456" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/nmred" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://www.swanlinux.net" target="_blank" title="Nmred">Nmred</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    $('#toc.toc-aside').css('display', 'block');
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    $('#toc.toc-aside').css('display', 'none');
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','block');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"nmred"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fbc789c531e32acef9db0c8b33befe435' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+  </body>
+</html>

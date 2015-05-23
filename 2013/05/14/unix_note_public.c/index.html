@@ -1,0 +1,847 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>UNIX 环境编程测试公共函数 | Swan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Nmred">
+    
+    <meta name="description" content="apue.c 头文件
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+5">
+    
+    
+    
+    
+    <link rel="alternative" href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" title="Swan" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="Swan" title="Swan"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Swan">Swan</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+						<li><a href="/tags">标签</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:www.swanlinux.net">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2013/05/14/unix_note_public.c/" title="UNIX 环境编程测试公共函数" itemprop="url">UNIX 环境编程测试公共函数</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.swanlinux.net" title="Nmred">Nmred</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2013-05-14T10:13:16.000Z" itemprop="datePublished">5月 14 2013</time>
+    更新日期:<time datetime="2015-04-09T19:06:05.523Z" itemprop="dateModified">4月 10 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#apue-c_头文件"><span class="toc-number">1.</span> <span class="toc-text">apue.c 头文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#stdout_error-c_标准输出错误处理函数"><span class="toc-number">2.</span> <span class="toc-text">stdout_error.c 标准输出错误处理函数</span></a></li></ol>
+		</div>
+		
+		<h3 id="apue-c_头文件">apue.c 头文件</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+</pre></td><td class="code"><pre><span class="preprocessor">#ifndef _APUE_H</span>
+<span class="preprocessor">#define _APUE_H</span>
+<span class="preprocessor">#define _XOPEN_SOURCE 600</span>
+
+<span class="preprocessor">#include &lt;sys/types.h&gt;</span>
+<span class="preprocessor">#include &lt;sys/stat.h&gt;</span>
+<span class="preprocessor">#include &lt;sys/termios.h&gt;</span>
+<span class="preprocessor">#ifndef TIOCGWINSZ</span>
+<span class="preprocessor">#include &lt;sys/ioctl.h&gt;</span>
+<span class="preprocessor">#endif</span>
+<span class="preprocessor">#include &lt;stdio.h&gt;</span>
+<span class="preprocessor">#include &lt;stdlib.h&gt;</span>
+<span class="preprocessor">#include &lt;stddef.h&gt;</span>
+<span class="preprocessor">#include &lt;string.h&gt;</span>
+<span class="preprocessor">#include &lt;unistd.h&gt;</span>
+<span class="preprocessor">#include &lt;signal.h&gt;</span>
+<span class="preprocessor">#define MAXLINE 4096</span>
+
+<span class="preprocessor">#define FILE_MODE (S_IRUSR |S_IWUSR | S_IRGRP | S_IROTH)</span>
+<span class="preprocessor">#define DIR_MODE (FILE_MODR | S_IXUSR | S_IXGRP | S_IXOTH)</span>
+
+typedef <span class="keyword">void</span> Sigfunc(<span class="keyword">int</span>);
+
+<span class="preprocessor">#if defined(SIG_IGN) && !defined(SIG_ERR)</span>
+<span class="preprocessor">#define SIG_ERR ((Sigfunc *) - 1) </span>
+<span class="preprocessor">#endif</span>
+
+<span class="preprocessor">#define min(a, b) ((a) &lt; (b) ? (a) : (b))</span>
+<span class="preprocessor">#define max(a, b) ((a) &gt; (b) ? (a) : (b))</span>
+
+<span class="keyword">char</span> *path_alloc(<span class="keyword">int</span> *);
+<span class="keyword">long</span> open_max(<span class="keyword">void</span>);
+<span class="keyword">void</span> clr_fl(<span class="keyword">int</span>, <span class="keyword">int</span>);
+<span class="keyword">void</span> set_fl(<span class="keyword">int</span>, <span class="keyword">int</span>);
+<span class="keyword">void</span> pr_exit(<span class="keyword">int</span>);
+<span class="keyword">void</span> pr_mask(<span class="keyword">const</span> <span class="keyword">char</span> *);
+Sigfunc *signal_intr(<span class="keyword">int</span>, Sigfunc *);
+
+<span class="keyword">int</span> tty_cbreak(<span class="keyword">int</span>);
+<span class="keyword">int</span> tty_raw(<span class="keyword">int</span>);
+<span class="keyword">int</span> tty_reset(<span class="keyword">int</span>);
+<span class="keyword">void</span> tty_atexit(<span class="keyword">void</span>);
+<span class="preprocessor">#ifdef ECHO</span>
+<span class="keyword">struct</span> termios *tty_termios(<span class="keyword">void</span>);
+<span class="preprocessor">#endif</span>
+
+<span class="keyword">void</span> sleep_us(unsigned <span class="keyword">int</span>);
+ssize_t readn(<span class="keyword">int</span>, <span class="keyword">void</span> *, size_t);
+ssize_t writen(<span class="keyword">int</span>, <span class="keyword">const</span> <span class="keyword">void</span> *, size_t);
+<span class="keyword">void</span> daemonize(<span class="keyword">const</span> <span class="keyword">char</span> *);
+<span class="keyword">int</span> s_pipe(<span class="keyword">int</span> *);
+<span class="keyword">int</span> recv_fd(<span class="keyword">int</span>, ssize_t (*func)(<span class="keyword">int</span>, <span class="keyword">const</span> <span class="keyword">void</span> *, size_t));
+<span class="keyword">int</span> send_fd(<span class="keyword">int</span>, <span class="keyword">int</span>);
+<span class="keyword">int</span> send_err(<span class="keyword">int</span>, <span class="keyword">int</span>, <span class="keyword">const</span> <span class="keyword">char</span> *);
+<span class="keyword">int</span> serv_listen(<span class="keyword">const</span> <span class="keyword">char</span> *);
+<span class="keyword">int</span> serv_accept(<span class="keyword">int</span>, uid_t *);
+<span class="keyword">int</span> cli_conn(<span class="keyword">const</span> <span class="keyword">char</span> *);
+<span class="keyword">int</span> buf_args(<span class="keyword">char</span> *, <span class="keyword">int</span> (*func)(<span class="keyword">int</span>, <span class="keyword">char</span> **));
+<span class="keyword">int</span> ptym_open(<span class="keyword">char</span> *, <span class="keyword">int</span>);
+<span class="keyword">int</span> ptys_open(<span class="keyword">char</span> *);
+<span class="preprocessor">#ifdef TIOCGWINSZ</span>
+pid_t pty_fork(<span class="keyword">int</span> *, <span class="keyword">char</span> *, <span class="keyword">int</span>, <span class="keyword">const</span> <span class="keyword">struct</span> termios *, <span class="keyword">const</span> <span class="keyword">struct</span> winsize *);
+<span class="preprocessor">#endif</span>
+
+<span class="keyword">int</span> lock_reg(<span class="keyword">int</span>, <span class="keyword">int</span>, <span class="keyword">int</span>, off_t, <span class="keyword">int</span>, off_t);
+<span class="preprocessor">#define read_lock(fd, offset, whence, len) \</span>
+	lock_reg((fd), F_SETLK, F_RDLCK, (offset), (whence), (len))
+<span class="preprocessor">#define readw_lock(fd, offset, whence, len) \</span>
+	lock_reg((fd), F_SETLKW, F_RDLCK, (offset), (whence), (len))
+<span class="preprocessor">#define write_lock(fd, offset, whence, len) \</span>
+	lock_reg((fd), F_SETLK, F_WRLCK, (offset), (whence), (len))
+<span class="preprocessor">#define writew_lock(fd, offset, whence, len) \</span>
+	lock_reg((fd), F_SETLKW, F_WRLCK, (offset), (whence), (len))
+<span class="preprocessor">#define un_lock(fd, offset, whence, len) \</span>
+	lock_reg((fd), F_SETLK, F_UNLCK, (offset), (whence), (len))
+pid_t lock_test(<span class="keyword">int</span>, <span class="keyword">int</span>, off_t, <span class="keyword">int</span>, off_t);
+
+<span class="preprocessor">#define is_read_lockable(fd, offset, whence, len) \</span>
+	(lock_test((fd), F_RDLCK, (offset), (whence), (len)) == <span class="number">0</span>)
+<span class="preprocessor">#define is_write_lockable(fd, offset, whence, len) \</span>
+	(lock_test((fd), F_WRLCK, (offset), (whence), (len)) == <span class="number">0</span>)
+
+<span class="comment">// 错误处理函数，全部标准输出</span>
+<span class="keyword">void</span> err_dump(<span class="keyword">const</span> <span class="keyword">char</span> *, ...);
+<span class="keyword">void</span> err_msg(<span class="keyword">const</span> <span class="keyword">char</span> *, ...);
+<span class="keyword">void</span> err_quit(<span class="keyword">const</span> <span class="keyword">char</span> *, ...);
+<span class="keyword">void</span> err_exit(<span class="keyword">int</span>, <span class="keyword">const</span> <span class="keyword">char</span> *, ...);
+<span class="keyword">void</span> err_ret(<span class="keyword">const</span> <span class="keyword">char</span> *, ...);
+<span class="keyword">void</span> err_sys(<span class="keyword">const</span> <span class="keyword">char</span> *, ...);
+
+<span class="keyword">void</span> log_msg(<span class="keyword">const</span> <span class="keyword">char</span> *, ...);
+<span class="keyword">void</span> log_open(<span class="keyword">const</span> <span class="keyword">char</span> *, <span class="keyword">int</span>, <span class="keyword">int</span>);
+<span class="keyword">void</span> log_quit(<span class="keyword">const</span> <span class="keyword">char</span> *, ...);
+<span class="keyword">void</span> log_ret(<span class="keyword">const</span> <span class="keyword">char</span> *, ...);
+<span class="keyword">void</span> log_sys(<span class="keyword">const</span> <span class="keyword">char</span> *, ...);
+
+<span class="keyword">void</span> TELL_WAIT(<span class="keyword">void</span>);
+<span class="keyword">void</span> TELL_PARENT(pid_t);
+<span class="keyword">void</span> TELL_CHILD(pid_t);
+<span class="keyword">void</span> WAIT_PARENT(<span class="keyword">void</span>);
+<span class="keyword">void</span> WAIT_CHILD(<span class="keyword">void</span>);
+
+<span class="preprocessor">#endif</span>
+</pre></td></tr></table></figure>
+
+<h3 id="stdout_error-c_标准输出错误处理函数">stdout_error.c 标准输出错误处理函数</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+</pre></td><td class="code"><pre><span class="comment">#include "apue.h"                                                                      </span>
+<span class="comment">#include &lt;errno.h&gt;                                                                     </span>
+<span class="comment">#include &lt;stdarg.h&gt;                                                                    </span>
+
+static void err_doit(int, int, const char *, va_list);                                 
+
+/**                                                                                    
+ * 没有致命错误，只是打印一条信息                                                      
+ */                                                                                    
+void err_ret(const char *fmt, <span class="keyword">...</span>)                                                     
+{                                                                                      
+	va_list ap;                                                                        
+	va_start(ap, fmt);                                                                 
+	err_doit(<span class="number">1</span>, errno, fmt, ap);                                                       
+	va_end(ap);                                                                        
+}                                                                                      
+
+void err_sys(const char *fmt, <span class="keyword">...</span>)                                                     
+{                                                                                      
+	va_list ap;                                                                        
+	va_start(ap, fmt);                                                                 
+	err_doit(<span class="number">1</span>, errno, fmt, ap);                                                       
+	va_end(ap);                                                                        
+	exit(<span class="number">1</span>);                                                                           
+}
+
+
+void err_exit(int error, const char *fmt, <span class="keyword">...</span>)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	err_doit(<span class="number">1</span>, error, fmt, ap);
+	va_end(ap);
+	exit(<span class="number">1</span>);
+}
+
+void err_dump(const char *fmt, <span class="keyword">...</span>)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	err_doit(<span class="number">1</span>, errno, fmt, ap);
+	va_end(ap);
+	abort();
+	exit(<span class="number">1</span>);
+}
+
+void err_msg(const char *fmt, <span class="keyword">...</span>)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	err_doit(<span class="number">0</span>, <span class="number">0</span>, fmt, ap);
+	va_end(ap);
+}
+
+void err_quit(const char *fmt, <span class="keyword">...</span>)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	err_doit(<span class="number">0</span>, <span class="number">0</span>, fmt, ap);
+	va_end(ap);
+	exit(<span class="number">1</span>);
+}
+
+static void err_doit(int errnoflag, int error, const char *fmt, va_list ap)
+{
+	char buf[MAXLINE];
+	vsnprintf(buf, MAXLINE, fmt, ap);
+	<span class="keyword">if</span> (errnoflag) {
+		snprintf(buf + strlen(buf), MAXLINE - strlen(buf), <span class="string">" :%s"</span>, strerror(error));
+	}
+
+	strcat(buf, <span class="string">"\n"</span>);
+	fflush(stdout); // 由于stdout和stderr是一个缓存区
+	fputs(buf, stderr);
+	fflush(<span class="literal">NULL</span>); // 刷新所有的标准 IO 缓存区
+}
+</pre></td></tr></table></figure>
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/public/">public</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/《unix 高级编程》-Note/">《unix 高级编程》-Note</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.swanlinux.net/2013/05/14/unix_note_public.c/" data-title="UNIX 环境编程测试公共函数 | Swan" data-tsina="1810958350" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2013/05/14/unix_note_file_directory/" title="文件和目录">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  文件和目录</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2013/05/14/unix_note_stanard_file_io/"  title="标准 IO 库">
+ <strong>NEXT:</strong><br/> 
+ <span>标准 IO 库
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#apue-c_头文件"><span class="toc-number">1.</span> <span class="toc-text">apue.c 头文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#stdout_error-c_标准输出错误处理函数"><span class="toc-number">2.</span> <span class="toc-text">stdout_error.c 标准输出错误处理函数</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/C 语言/" title="C 语言">C 语言<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/categories/linux/" title="linux">linux<sup>21</sup></a></li>
+		
+			<li><a href="/categories/php/" title="php">php<sup>5</sup></a></li>
+		
+			<li><a href="/categories/《C++ Primer Plus(第6版)》练习/" title="《C++ Primer Plus(第6版)》练习">《C++ Primer Plus(第6版)》练习<sup>2</sup></a></li>
+		
+			<li><a href="/categories/《unix 高级编程》-Note/" title="《unix 高级编程》-Note">《unix 高级编程》-Note<sup>9</sup></a></li>
+		
+			<li><a href="/categories/《快学scala》练习/" title="《快学scala》练习">《快学scala》练习<sup>16</sup></a></li>
+		
+			<li><a href="/categories/虚拟技术/" title="虚拟技术">虚拟技术<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05">五月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04">四月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10">十月 2014</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09">九月 2014</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04">四月 2014</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03">三月 2014</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02">二月 2014</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09">九月 2013</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05">五月 2013</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/02">二月 2013</a><span class="archive-list-count">20</span></li></ul>
+  </div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/C++/" title="C++">C++<sup>2</sup></a></li>
+		
+			<li><a href="/tags/GIT/" title="GIT">GIT<sup>1</sup></a></li>
+		
+			<li><a href="/tags/apache/" title="apache">apache<sup>1</sup></a></li>
+		
+			<li><a href="/tags/crontab at/" title="crontab at">crontab at<sup>1</sup></a></li>
+		
+			<li><a href="/tags/directory/" title="directory">directory<sup>1</sup></a></li>
+		
+			<li><a href="/tags/dns/" title="dns">dns<sup>1</sup></a></li>
+		
+			<li><a href="/tags/esxi/" title="esxi">esxi<sup>1</sup></a></li>
+		
+			<li><a href="/tags/extern/" title="extern">extern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/file io/" title="file io">file io<sup>3</sup></a></li>
+		
+			<li><a href="/tags/firewall/" title="firewall">firewall<sup>1</sup></a></li>
+		
+			<li><a href="/tags/ftp/" title="ftp">ftp<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hadoop/" title="hadoop">hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/tags/lvs/" title="lvs">lvs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/network/" title="network">network<sup>1</sup></a></li>
+		
+			<li><a href="/tags/newt/" title="newt">newt<sup>4</sup></a></li>
+		
+			<li><a href="/tags/nfs/" title="nfs">nfs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/process/" title="process">process<sup>4</sup></a></li>
+		
+			<li><a href="/tags/public/" title="public">public<sup>1</sup></a></li>
+		
+			<li><a href="/tags/quota/" title="quota">quota<sup>1</sup></a></li>
+		
+			<li><a href="/tags/raid lvm/" title="raid lvm">raid lvm<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<div style="float:left"><p> Hello ,I&#39;m Nmred. For now I&#39;m a phper. <br/>
+			Everything in order to facilitate</p></div>
+	 <div style="float:right">
+		<a target="_blank" href="http://weibo.com/u/1810958350?s=6uyXnP"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1810958350/614754d4/1.png"></a>
+	 </div>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/623713456" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/nmred" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://www.swanlinux.net" target="_blank" title="Nmred">Nmred</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    $('#toc.toc-aside').css('display', 'block');
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    $('#toc.toc-aside').css('display', 'none');
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','block');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"nmred"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fbc789c531e32acef9db0c8b33befe435' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+  </body>
+</html>

@@ -1,0 +1,578 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Linux系统中配置代理服务器Squid | Swan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Nmred">
+    
+    <meta name="description" content="squid简介
+1.代理服务的应用原理
+代理服务器工作在TCP/IP的应用层 
+
+2.squid服务器的功能
+1)提供对HTTP和FTP协议的代理服务
+2)缓存代理的内容，提高客户端访问网站的速度，并能够节约出口网络流量
+3)对客户端地址进行访问控制，限制允许访问squid服务器的客户机
+4)对目标">
+    
+    
+    
+    
+    <link rel="alternative" href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" title="Swan" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="Swan" title="Swan"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Swan">Swan</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+						<li><a href="/tags">标签</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:www.swanlinux.net">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2013/02/12/linux_squid/" title="Linux系统中配置代理服务器Squid" itemprop="url">Linux系统中配置代理服务器Squid</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.swanlinux.net" title="Nmred">Nmred</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2013-02-12T10:13:16.000Z" itemprop="datePublished">2月 12 2013</time>
+    更新日期:<time datetime="2015-04-09T19:06:05.519Z" itemprop="dateModified">4月 10 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#squid简介"><span class="toc-number">1.</span> <span class="toc-text">squid简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#配置Squid"><span class="toc-number">2.</span> <span class="toc-text">配置Squid</span></a></li></ol>
+		</div>
+		
+		<h3 id="squid简介">squid简介</h3>
+<p>1.代理服务的应用原理</p>
+<p>代理服务器工作在TCP/IP的应用层 </p>
+<p><img src="/image/linux/linux-squid-001-019.png" alt="linux-squid-001-019"></p>
+<p>2.squid服务器的功能</p>
+<p>1)提供对HTTP和FTP协议的代理服务</p>
+<p>2)缓存代理的内容，提高客户端访问网站的速度，并能够节约出口网络流量</p>
+<p>3)对客户端地址进行访问控制，限制允许访问squid服务器的客户机</p>
+<p>4)对目标地址进行访问控制，限制客户端允许访问的网站</p>
+<p>5)根据时间进行访问控制，限定客户端可以使用代理服务的时间</p>
+<p>3.squid缓存代理</p>
+<p>缓存代理作用</p>
+<p>1)通过缓存的方式为用户提供Web访问加速</p>
+<p>2)对用户的Web访问进行过滤控制 </p>
+<p><img src="/image/linux/linux-squid-002-019.png" alt="linux-squid-002-019"></p>
+<p>4.squid普通和透明代理</p>
+<p>1)普通代理服务</p>
+<p>a.即标准的、传统的代理服务</p>
+<p>b.需要客户机在浏览器中指定代理服务器的地址、端口</p>
+<p>2)透明代理服务</p>
+<p>a.适用于企业的网关主机</p>
+<p>b.客户机不需要指定代理服务器地址、端口等信息</p>
+<p>c.通过iptables将客户机的Web访问数据转交给代理服务程序处理</p>
+<p>5.squid反向代理</p>
+<p>为Internet用户访问企业Web站点提供缓存加速 </p>
+<p><img src="/image/linux/linux-squid-003-019.png" alt="linux-squid-003-019"></p>
+<p>6.Squid安装和配置</p>
+<p>1)安装squid软件包</p>
+<p>yum -y install squid*</p>
+<p>2)squid配置文件</p>
+<p>/etc/squid/squid.conf</p>
+<p>3)启动squid服务</p>
+<p>service squid start/restart</p>
+<p>4)停止squid服务</p>
+<p>service  squid stop</p>
+<p>5)重新加载配置文件</p>
+<p>squid -k reconfig</p>
+<p>7.配置文件squid.conf</p>
+<p>常用配置项</p>
+<blockquote>
+<p>http_port 192.168.10.1:3128</p>
+<p>cache_mem 64 MB</p>
+<p>maximum_object_size 4096 KB</p>
+<p>reply_body_max_size 10480000 allow all</p>
+<p>access_log /var/log/squid/access.log</p>
+<p>visible_hostname 192.168.10.1</p>
+<p>cache_dir ufs /var/spool/squid 100 16 256</p>
+</blockquote>
+<p>8.ACL访问控制</p>
+<p>1)ACL（Access Control List，访问控制列表）</p>
+<p>可以从客户机的IP地址、请求访问的URL/域名/文件类型、访问时间、并发请求数等各方面进行控制</p>
+<p>2)应用访问控制的方式</p>
+<p>a.定义acl列表</p>
+<p>acl 列表名称 列表类型 列表内容</p>
+<p>b.针对acl列表进行限制</p>
+<p>http_access allow或deny 列表名</p>
+<p>3)最基本acl列表控制</p>
+<p>最基本的ACL访问控制示例</p>
+<p>禁止任何客户机使用代理服务 </p>
+<p><img src="/image/linux/linux-squid-004-019.png" alt="linux-squid-004-019"></p>
+<p>4)acl列表类型</p>
+<p>常用的acl列表类型</p>
+<p><img src="/image/linux/linux-squid-005-019.png" alt="linux-squid-005-019"></p>
+<p>5)ACL列表定义示例</p>
+<pre><code>acl LAN1 src <span class="number">192.168</span><span class="number">.1</span><span class="number">.0</span>/<span class="number">24</span>
+acl PC1 src <span class="number">192.168</span><span class="number">.1</span><span class="number">.66</span>/<span class="number">32</span>
+acl Blk_Domain dstdomain <span class="preprocessor">.qq</span><span class="preprocessor">.com</span> <span class="preprocessor">.kaixin</span>001<span class="preprocessor">.com</span>
+acl Work_Hours time MTWHF <span class="number">08</span>:<span class="number">30</span>-<span class="number">17</span>:<span class="number">30</span>
+acl Max20_Conn maxconn <span class="number">20</span>
+acl Blk_URL url_regex -i ^rtsp:// ^mms://
+acl Blk_Words urlpath_regex -i sex adult
+acl RealFile urlpath_regex -i \<span class="preprocessor">.rmvb</span>$ \<span class="preprocessor">.rm</span>$
+</code></pre><p>6)允许或拒绝acl列表</p>
+<p>根据已经定义的部分ACL列表进行访问控制</p>
+<pre><code>http_access deny LAN1 Blk_URL
+http_access deny LAN1 Blk_Words
+http_access deny PC1 RealFile
+http_access deny PC1 Max20_Conn
+http_access allow LAN1 Work_Hours
+</code></pre><h3 id="配置Squid">配置Squid</h3>
+<p>1.普通squid代理服务器</p>
+<p>1)配置环境说明 </p>
+<p><img src="/image/linux/linux-squid-006-019.png" alt="linux-squid-006-019"></p>
+<p>2)修改配置文件如下：</p>
+<p>3)重新加载配置文件</p>
+<pre><code><span class="preprocessor">#squid -k reconfig</span>
+</code></pre><p>4)在客户机上测试</p>
+<p>a.首先在客户机浏览器中设置代理IP：192.168.129.1  端口：3128</p>
+<p><img src="/image/linux/linux-squid-007-019.png" alt="linux-squid-007-019"></p>
+<p><img src="/image/linux/linux-squid-008-019.png" alt="linux-squid-008-019"></p>
+<p>b.访问<a href="http://192.168.128.2" target="_blank">http://192.168.128.2</a></p>
+<p><img src="/image/linux/linux-squid-009-019.png" alt="linux-squid-009-019"></p>
+<p>2.配置squid透明代理</p>
+<p>1)配置环境说明</p>
+<p>基本环境和配置普通代理服务器一样，唯一区别就是客户机需要加上网关：192.168.129.1</p>
+<p>2)修改配置文件如下：</p>
+<p>3)重新加载配置文件</p>
+<pre><code><span class="preprocessor">#squid -k reconfig</span>
+</code></pre><p>4)设置防火墙将80端口请求转化为3128 </p>
+<p><img src="/image/linux/linux-squid-010-019.png" alt="linux-squid-010-019"></p>
+<p>5)在客户机上测试</p>
+<p>a.这个就不用设置代理IP和端口了</p>
+<p>b.访问<a href="http://192.168.128.2" target="_blank">http://192.168.128.2</a></p>
+<p>3.配置squid反向代理</p>
+<p>1)配置环境说明</p>
+<p>注意该环境下默认将129网段的模拟为公网 </p>
+<p><img src="/image/linux/linux-squid-011-019.png" alt="linux-squid-011-019"></p>
+<p>2)修改配置文件如下：</p>
+<p>3)重新加载配置文件</p>
+<pre><code><span class="preprocessor">#squid -k reconfig</span>
+</code></pre><p>4)在客户机上测试</p>
+<p>a.这个就不用设置代理IP和端口了</p>
+<p>b.访问<a href="http://192.168.129.1" target="_blank">http://192.168.129.1</a></p>
+<p><img src="/image/linux/linux-squid-012-019.png" alt="linux-squid-012-019"></p>
+<p>4.为虚拟主机配置squid反向代理</p>
+<p>1)配置环境说明</p>
+<p>注意该环境下默认将129网段的模拟为公网</p>
+<p><img src="/image/linux/linux-squid-013-019.png" alt="linux-squid-013-019"></p>
+<p>2)修改配置文件如下：</p>
+<p>3)将WEB服务器配置成虚拟主机(配置虚拟主机的部分，一定要注意目录权限问题)</p>
+<p>4)重新加载配置文件</p>
+<pre><code><span class="preprocessor">#squid -k reconfig</span>
+</code></pre><p>5)在客户机上测试</p>
+<p>a.用DNS解析www.baidu.com和www.sina.com到192.168.129.1</p>
+<p>b.分别访问www.baidu.com和www.sina.com</p>
+<p>5.cache_peer的特殊用法</p>
+<p>1)具有lvs负载均衡的特性(轮循负载)</p>
+<pre><code>cache_peer <span class="number">192.168</span><span class="number">.10</span><span class="number">.2</span> <span class="keyword">parent</span> <span class="number">80</span> <span class="number">0</span> originserver weight<span class="subst">=</span><span class="number">1</span> round<span class="attribute">-robin</span>
+cache_peer <span class="number">192.168</span><span class="number">.10</span><span class="number">.3</span> <span class="keyword">parent</span> <span class="number">80</span> <span class="number">0</span> originserver weight<span class="subst">=</span><span class="number">1</span> round<span class="attribute">-robin</span>
+</code></pre><p>2)具有自动检测后台web服务器,检测其心跳的作用,当后台10.2坏掉后,外部访问会自动去访问10.3这台服务器,具有ha集群心跳作用</p>
+<pre><code>cache_peer <span class="number">192.168</span><span class="number">.10</span><span class="number">.2</span> <span class="keyword">parent</span> <span class="number">80</span> <span class="number">0</span> originserver
+cache_peer <span class="number">192.168</span><span class="number">.10</span><span class="number">.3</span> <span class="keyword">parent</span> <span class="number">80</span> <span class="number">0</span> originserver
+</code></pre><p>注:</p>
+<blockquote>
+<p>a.当用负载时,数据可能无法通过squid缓存,而冗余这种比较好，而且有squid缓存.</p>
+<p>b.用squid做负载均衡时必须是用同一存储的方式才会有缓存效果</p>
+</blockquote>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/squid/">squid</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.swanlinux.net/2013/02/12/linux_squid/" data-title="Linux系统中配置代理服务器Squid | Swan" data-tsina="1810958350" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2013/02/12/linux_ssh/" title="Linux 文件共享之 SSH">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Linux 文件共享之 SSH</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2013/02/12/linux_firewall_setting/"  title="Linux系统中防火墙配置">
+ <strong>NEXT:</strong><br/> 
+ <span>Linux系统中防火墙配置
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#squid简介"><span class="toc-number">1.</span> <span class="toc-text">squid简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#配置Squid"><span class="toc-number">2.</span> <span class="toc-text">配置Squid</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/C 语言/" title="C 语言">C 语言<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/categories/linux/" title="linux">linux<sup>21</sup></a></li>
+		
+			<li><a href="/categories/php/" title="php">php<sup>5</sup></a></li>
+		
+			<li><a href="/categories/《C++ Primer Plus(第6版)》练习/" title="《C++ Primer Plus(第6版)》练习">《C++ Primer Plus(第6版)》练习<sup>2</sup></a></li>
+		
+			<li><a href="/categories/《unix 高级编程》-Note/" title="《unix 高级编程》-Note">《unix 高级编程》-Note<sup>9</sup></a></li>
+		
+			<li><a href="/categories/《快学scala》练习/" title="《快学scala》练习">《快学scala》练习<sup>16</sup></a></li>
+		
+			<li><a href="/categories/虚拟技术/" title="虚拟技术">虚拟技术<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05">五月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04">四月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10">十月 2014</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09">九月 2014</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04">四月 2014</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03">三月 2014</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02">二月 2014</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09">九月 2013</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05">五月 2013</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/02">二月 2013</a><span class="archive-list-count">20</span></li></ul>
+  </div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/C++/" title="C++">C++<sup>2</sup></a></li>
+		
+			<li><a href="/tags/GIT/" title="GIT">GIT<sup>1</sup></a></li>
+		
+			<li><a href="/tags/apache/" title="apache">apache<sup>1</sup></a></li>
+		
+			<li><a href="/tags/crontab at/" title="crontab at">crontab at<sup>1</sup></a></li>
+		
+			<li><a href="/tags/directory/" title="directory">directory<sup>1</sup></a></li>
+		
+			<li><a href="/tags/dns/" title="dns">dns<sup>1</sup></a></li>
+		
+			<li><a href="/tags/esxi/" title="esxi">esxi<sup>1</sup></a></li>
+		
+			<li><a href="/tags/extern/" title="extern">extern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/file io/" title="file io">file io<sup>3</sup></a></li>
+		
+			<li><a href="/tags/firewall/" title="firewall">firewall<sup>1</sup></a></li>
+		
+			<li><a href="/tags/ftp/" title="ftp">ftp<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hadoop/" title="hadoop">hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/tags/lvs/" title="lvs">lvs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/network/" title="network">network<sup>1</sup></a></li>
+		
+			<li><a href="/tags/newt/" title="newt">newt<sup>4</sup></a></li>
+		
+			<li><a href="/tags/nfs/" title="nfs">nfs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/process/" title="process">process<sup>4</sup></a></li>
+		
+			<li><a href="/tags/public/" title="public">public<sup>1</sup></a></li>
+		
+			<li><a href="/tags/quota/" title="quota">quota<sup>1</sup></a></li>
+		
+			<li><a href="/tags/raid lvm/" title="raid lvm">raid lvm<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<div style="float:left"><p> Hello ,I&#39;m Nmred. For now I&#39;m a phper. <br/>
+			Everything in order to facilitate</p></div>
+	 <div style="float:right">
+		<a target="_blank" href="http://weibo.com/u/1810958350?s=6uyXnP"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1810958350/614754d4/1.png"></a>
+	 </div>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/623713456" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/nmred" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://www.swanlinux.net" target="_blank" title="Nmred">Nmred</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    $('#toc.toc-aside').css('display', 'block');
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    $('#toc.toc-aside').css('display', 'none');
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','block');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"nmred"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fbc789c531e32acef9db0c8b33befe435' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+  </body>
+</html>

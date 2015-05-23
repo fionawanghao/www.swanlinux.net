@@ -1,0 +1,758 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Linux中的Apache配置 | Swan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Nmred">
+    
+    <meta name="description" content="HTTPD服务的目录结构
+HTTPD安装的说明
+   [安装APACHE的部分配置]
+   ./configure –prefix=/usr/local/apache2/ –sysconfdir=/etc/httpd/conf
+                     安装APACHE的目录    ">
+    
+    
+    
+    
+    <link rel="alternative" href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" title="Swan" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="Swan" title="Swan"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Swan">Swan</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+						<li><a href="/tags">标签</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:www.swanlinux.net">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2013/02/12/linux_apache_setting/" title="Linux中的Apache配置" itemprop="url">Linux中的Apache配置</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.swanlinux.net" title="Nmred">Nmred</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2013-02-12T10:13:16.000Z" itemprop="datePublished">2月 12 2013</time>
+    更新日期:<time datetime="2015-04-09T19:06:05.518Z" itemprop="dateModified">4月 10 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTPD服务的目录结构"><span class="toc-number">1.</span> <span class="toc-text">HTTPD服务的目录结构</span></a></li><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HTTPD安装的说明"><span class="toc-number">1.1.</span> <span class="toc-text">HTTPD安装的说明</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#按照上述安装APACHE的目录"><span class="toc-number">1.2.</span> <span class="toc-text">按照上述安装APACHE的目录</span></a></li></ol><li class="toc-item toc-level-3"><a class="toc-link" href="#构建基本可用的Web服务器"><span class="toc-number">2.</span> <span class="toc-text">构建基本可用的Web服务器</span></a></li><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#构建的步骤"><span class="toc-number">2.1.</span> <span class="toc-text">构建的步骤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#httpd-conf配置文件"><span class="toc-number">2.2.</span> <span class="toc-text">httpd.conf配置文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#httpd服务的访问控制"><span class="toc-number">2.3.</span> <span class="toc-text">httpd服务的访问控制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Apache虚拟目录"><span class="toc-number">2.4.</span> <span class="toc-text">Apache虚拟目录</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#构建虚拟Web主机"><span class="toc-number">2.5.</span> <span class="toc-text">构建虚拟Web主机</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#建立系统用户的个人主页"><span class="toc-number">2.6.</span> <span class="toc-text">建立系统用户的个人主页</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Apache_Rewrite_拟静态配置"><span class="toc-number">2.7.</span> <span class="toc-text">Apache Rewrite 拟静态配置</span></a></li></ol>
+		</div>
+		
+		<h3 id="HTTPD服务的目录结构">HTTPD服务的目录结构</h3>
+<h4 id="HTTPD安装的说明">HTTPD安装的说明</h4>
+<p>   [安装APACHE的部分配置]</p>
+<pre><code>   ./configure –prefix=<span class="regexp">/usr/</span>local/apache2/ –sysconfdir=<span class="regexp">/etc/</span>httpd/conf
+                     安装APACHE的目录                安装APACHE时的配置文件目录
+</code></pre><h4 id="按照上述安装APACHE的目录">按照上述安装APACHE的目录</h4>
+<blockquote>
+<p>服务目录：/usr/local/apache2/</p>
+<p>主配置文件：/etc/httpd/conf/httpd.conf</p>
+<p>网页目录：/usr/local/apache2/htdocs/</p>
+<p>服务脚本：/usr/local/apache2/bin/apachectl</p>
+<p>执行程序：/usr/local/apache2/bin/httpd</p>
+<p>访问日志： /usr/local/apache2/log/access_log</p>
+<p>错误日志： /usr/local/apache2/log/error_log </p>
+</blockquote>
+<h3 id="构建基本可用的Web服务器">构建基本可用的Web服务器</h3>
+<h4 id="构建的步骤">构建的步骤</h4>
+<p>1) 修改主配置文件httpd.conf，进行相关设置</p>
+<p>2) 进行语法检查</p>
+<pre><code>/usr/<span class="built_in">local</span>/apache2/bin/apachectl  <span class="attribute">-t</span>
+或者
+/usr/<span class="built_in">local</span>/apache2/bin/httpd  <span class="attribute">-t</span>
+</code></pre><p>3) 启动httpd服务</p>
+<pre><code>/usr/<span class="keyword">local</span>/apache2/bin/apachectl start
+</code></pre><p>4) 访问网站进行测试</p>
+<p><a href="http://www.lamp.com" target="_blank">http://www.lamp.com</a></p>
+<h4 id="httpd-conf配置文件">httpd.conf配置文件</h4>
+<p>1)常用的全局配置参数 </p>
+<blockquote>
+<p>ServerRoot：              服务目录</p>
+<p>ServerAdmin：             管理员邮箱</p>
+<p>User：                    运行服务的用户身份</p>
+<p>Group：                   运行服务的组身份</p>
+<p>ServerName：              网站服务器的域名</p>
+<p>DocumentRoot              网页文档的根目录</p>
+<p>Listen：                  监听的IP地址、端口号</p>
+<p>PidFile：                 保存httpd进程PID号的文件</p>
+<p>DirectoryIndex：          默认的索引页文件</p>
+<p>ErrorLog：                错误日志文件的位置</p>
+<p>CustomLog：               访问日志文件的位置</p>
+<p>LogLevel：                记录日志的级别，默认为warn</p>
+<p>Timeout：                 网络连接超时，默认为300秒</p>
+<p>KeepAlive：               是否保持连接，可选On或Off</p>
+<p>MaxKeepAliveRequests：    每次连接最多请求文件数</p>
+<p>KeepAliveTimeout：        保持连接状态时的超时时间</p>
+<p>Include：                 需要包含进来的其他配置文件</p>
+<p>StartServers 8            http启动进程的数目 </p>
+</blockquote>
+<p>2)httpd服务的日志</p>
+<p>两类日志文件</p>
+<blockquote>
+<p>访问日志：/usr/local/apache2/logs/access_log</p>
+<p>错误日志：/usr/local/apache2/logs/error_log</p>
+</blockquote>
+<p>3)载入模块指令 </p>
+<p>Apache服务器采用动态共享对象（DSO，Dynamic Shared Object）的机制，在启动Apache服务器时可根据实际需要载入适当的模块，使其具有相应的功能。</p>
+<p>载入模块的相关指令有：</p>
+<blockquote>
+<p>LoadModule<br>ClearModuleList<br>AddModule</p>
+</blockquote>
+<p>LoadModule指令用于动态载入模块，即将模块外挂在Apache服务器上。</p>
+<p>语法：</p>
+<p>LoadModule 模块名称  模块文件路径全名</p>
+<p>实例：</p>
+<p>LoadModule status_module modules/mod_status.so </p>
+<p>4)容器指令</p>
+<p>容器指令（container directive）通常包括在&lt;>括号内，较容易识别，常用的容器指令有：</p>
+<pre><code><span class="tag">&lt;<span class="title">Directory</span>&gt;</span>
+<span class="tag">&lt;<span class="title">Files</span>&gt;</span>
+<span class="tag">&lt;<span class="title">Location</span>&gt;</span>
+<span class="tag">&lt;<span class="title">VirtualHost</span>&gt;</span>
+</code></pre><p>a.使用<Directory>… </Directory>设置指定目录的访问权限，其中可包含：</p>
+<pre><code><span class="keyword"><span class="common">Options</span></span>
+<span class="keyword">AllowOverride</span>
+<span class="keyword"><span class="common">Order</span></span>
+<span class="keyword"><span class="common">Allow</span></span>
+<span class="keyword"><span class="common">Deny</span></span>
+</code></pre><p>五个属性:</p>
+<p>I.Options属性</p>
+<p>Options  FollowSymLinks  Indexes  MultiViews</p>
+<p>Options可以组合设置下列选项：</p>
+<blockquote>
+<p>All：用户可以在此目录中作任何事情。</p>
+<p>ExecCGI：允许在此目录中执行CGI程序。</p>
+<p>FollowSymLinks：服务器可使用符号链接指向的文件或目录。</p>
+<p>Indexes：服务器可生成此目录的文件列表。</p>
+<p>None：不允许访问此目录</p>
+<p>multiviews: 允许多用户浏览</p>
+</blockquote>
+<p>II.AllowOverride</p>
+<blockquote>
+<p>AllowOverride None</p>
+</blockquote>
+<p>AllowOverride会根据设定的值决定是否读取目录中的.htaccess文件，来改变原来所设置的权限。</p>
+<blockquote>
+<p>All：读取.htaccess文件的内容，修改原来的访问权限。</p>
+<p>None：不读取.htaccess文件</p>
+</blockquote>
+<p>为避免用户自行建立.htaccess文件修改访问权限，http.conf文件中默认设置每个目录为： AllowOverride None。</p>
+<p>III.Allow</p>
+<p>设定允许访问Apache服务器的主机</p>
+<blockquote>
+<p>Allow from all</p>
+<p>允许所有主机的访问</p>
+</blockquote>
+<p>Allow from 202.96.0.97 202.96.0.98</p>
+<p>允许来自指定IP地址主机的访问</p>
+<p>IV.Deny</p>
+<p>设定拒绝访问Apache服务器的主机</p>
+<blockquote>
+<p>Deny from  all</p>
+<p>拒绝来自所有主机的访问</p>
+</blockquote>
+<p>Deny from  202.96.0.99  202.96.0.88</p>
+<p>拒绝指定IP地址主机的访问</p>
+<p>V.Order</p>
+<p>Order allow,deny</p>
+<p>Order用于指定allow和deny的先后次序。</p>
+<p>范例：</p>
+<blockquote>
+<p>Order deny,allow</p>
+<p>Deny from all</p>
+<p>Allow from 202.96.0.97</p>
+<p>Order allow,deny</p>
+<p>Allow from all</p>
+<p>Deny from 202.96.0.97</p>
+</blockquote>
+<p>b.<Files>容器包含只应用于指定文件的指令，文件应该由文件名（必要时使用统配符）指定</p>
+<p>实例：</p>
+<pre><code><span class="tag">&lt;Files  =  “^\.ht”&gt;</span>
+<span class="keyword"><span class="common">Order</span></span> allow,deny
+<span class="keyword"><span class="common">Deny</span></span> from <span class="literal">all</span>
+<span class="tag">&lt;/Files&gt;</span>
+</code></pre><p>c.<Location>容器包含只应用于特定URL的指令。</p>
+<p>实例：</p>
+<pre><code><span class="tag">&lt;Location /server-status&gt;</span>
+<span class="keyword"><span class="common">SetHandler</span></span> server-status
+<span class="keyword"><span class="common">order</span></span> deny,allow
+<span class="keyword"><span class="common">allow</span></span> from 127.0.0.1
+<span class="keyword"><span class="common">deny</span></span> from <span class="literal">all</span>
+<span class="tag">&lt;/Location&gt;</span>
+</code></pre><p>5)认证和授权</p>
+<p>a.认证类型:</p>
+<p>Basic</p>
+<p>digest(摘要认证)</p>
+<p>b.建立认证与授权的步骤</p>
+<p>建立用户库</p>
+<p>配置服务器的保护域</p>
+<p>什么用户具有访问权限</p>
+<p>c.认证指令：</p>
+<blockquote>
+<p>Authname     受保护领域名称</p>
+<p>Authtype     认证方式</p>
+<p>Authuserfile     认证口令文件</p>
+<p>authgroupfile 认证组文件</p>
+<p>Require user        授权指定用户</p>
+<p>Require group    授权指定组</p>
+<p>Require valid-user    授权给认证口令文件用户</p>
+</blockquote>
+<p>d.建立用户库基本认证</p>
+<blockquote>
+<p>htpasswd -c authfile username</p>
+<p>口令文件格式</p>
+<p>Username:password </p>
+</blockquote>
+<h4 id="httpd服务的访问控制">httpd服务的访问控制</h4>
+<p>1)基于用户的访问控制</p>
+<p>添加认证授权设置</p>
+<p><img src="/image/linux/linux-apache-001-015.png" alt="linux-apache-001-015"></p>
+<p>2)创建存储认证用户账号及口令的文件</p>
+<p>需使用htpasswd工具 </p>
+<p><img src="/image/linux/linux-apache-002-015.png" alt="linux-apache-002-015"></p>
+<p>3)配置内容解释(应用到上面认证与授权知识)</p>
+<p>a.AuthType Basic</p>
+<p>AuthType指令用于设置身份认证时传送密码的编码方式。设置为“Basic”时利用uuencode编码方式传送密码。</p>
+<p>AuthType需与AuthName 、Require、AuthUserFile一同使用。</p>
+<p>b.AuthName auth-domain</p>
+<p>AuthName指令对当前定义的认证区域进行命名，该名称会出现在浏览器客户端的用户认证对话框中，以标识用户被认证的区域。如认证区域名称中包含空格需用“”括起。</p>
+<p>AuthName需与AuthType、Require、AuthUserFile一同使用。</p>
+<p>c.Require</p>
+<p>Require指令用于设定可进行身份验证的用户。</p>
+<p>Require user 用户名 [用户名] ……</p>
+<p>设置指定用户名的用户可通过身份验证访问区域。</p>
+<p>Require group 组名 [组名 ] ……</p>
+<p>设置指定组内的用户可通过身份验证访问区域。</p>
+<p>Require valid-user</p>
+<p>设置所有合法用户可通过身份验证访问区域。</p>
+<p>d.htpasswd命令</p>
+<p>htpasswd指令用于创建密码文件和设置用户密码：</p>
+<blockquote>
+<p>htpasswd -c 文件名  用户名<br>例： htpasswd –c .htpasswd user1</p>
+</blockquote>
+<p>htpasswd 文件名  用户名</p>
+<p>在指定的密码文件中添加指定用户的密码，如该用户已存在则修改用户密码</p>
+<p>e.AuthUserFile</p>
+<p>AuthUserFile file-path</p>
+<p>AuthUserFile指令用于设置验证用户身份的密码文件，该文件名需设置绝对路径。</p>
+<p>例如：</p>
+<blockquote>
+<p>AuthUserFile /etc/httpd/conf/.htpasswd</p>
+<p>密码文件是用htpasswd命令创建的。</p>
+</blockquote>
+<p>AuthType指令用于设置身份认证时传送密码的编码方式。设置为“Basic”时利用uuencode编码方式传送密码。</p>
+<p>AuthType需与AuthName 、Require、AuthUserFile一同使用 </p>
+<h4 id="Apache虚拟目录">Apache虚拟目录</h4>
+<p>虚拟目录的优点:</p>
+<blockquote>
+<p>便于访问</p>
+<p>便于移动站点目录</p>
+<p>加大磁盘空间</p>
+<p>安全性好</p>
+</blockquote>
+<p>应用案例：</p>
+<p>为Apache在linux的根增加一个目录/vln128</p>
+<blockquote>
+<p>1)mkdir /vln128</p>
+<p>2)vi /etc/httpd/conf/http.conf</p>
+</blockquote>
+<p>在其中添加如下配置内容即可. </p>
+<p><img src="/image/linux/linux-apache-003-015.png" alt="linux-apache-003-015"></p>
+<p><img src="/image/linux/linux-apache-004-015.png" alt="linux-apache-004-015"></p>
+<h4 id="构建虚拟Web主机">构建虚拟Web主机</h4>
+<p>1)虚拟Web主机</p>
+<p>即在同一台服务器中运行多个Web站点的应用，其中每一个站点并不独立占用一台真正的计算机</p>
+<p>2)httpd支持的虚拟主机类型</p>
+<blockquote>
+<p>基于IP地址的虚拟主机</p>
+<p>基于端口的虚拟主机</p>
+<p>基于域名的虚拟主机</p>
+</blockquote>
+<p>3)构建虚拟Web主机-基于IP地址</p>
+<blockquote>
+<p>应用示例：</p>
+<p>构建2个虚拟Web站点：</p>
+<p>www.lamp.com，IP地址为 192.168.10.1</p>
+<p>www.accp.com，IP地址为 192.168.4.1</p>
+<p>在浏览器中访问这两个IP时，分别显示不同的内容 </p>
+</blockquote>
+<p><img src="/image/linux/linux-apache-005-015.png" alt="linux-apache-005-015"></p>
+<p>4)构建虚拟Web主机-基于端口</p>
+<blockquote>
+<p>应用示例：</p>
+<p>构建2个虚拟Web站点：</p>
+<p>www.lamp.com，IP地址、端口为 192.168.10.1:80</p>
+<p>www.accp.com，IP地址、端口为 192.168.10.1:8080</p>
+<p>在浏览器中访问这两个端口时，分别显示不同的内容</p>
+</blockquote>
+<p><img src="/image/linux/linux-apache-006-015.png" alt="linux-apache-006-015"></p>
+<p>5)构建虚拟Web主机-基于域名(一般生产环境的解决方案)</p>
+<blockquote>
+<p>应用示例：</p>
+<p>构建2个虚拟Web站点：</p>
+<p>www.lamp.com，IP地址为 192.168.216.128</p>
+<p>www.accp.com，IP地址为 192.168.216.128</p>
+<p>在浏览器中访问这两个域名时，分别显示不同的内容</p>
+</blockquote>
+<p><img src="/image/linux/linux-apache-007-015.png" alt="linux-apache-007-015"></p>
+<p><img src="/image/linux/linux-apache-008-015.png" alt="linux-apache-008-015"></p>
+<p><img src="/image/linux/linux-apache-009-015.png" alt="linux-apache-009-015"></p>
+<h4 id="建立系统用户的个人主页">建立系统用户的个人主页</h4>
+<p>1) 修改httpd.conf，启用个人主页功能</p>
+<p>UserDir public_html</p>
+<p><img src="/image/linux/linux-apache-010-015.png" alt="linux-apache-010-015"></p>
+<p>确认目录区域设置</p>
+<p>2) 建立个人主页测试网页</p>
+<p>~/public_html/index.html</p>
+<p>添加权限：chmod o+x /home/jerry/</p>
+<p>3) 重新启动httpd服务</p>
+<p>/usr/local/apache2/bin/apachectl  restart</p>
+<p>4) 访问测试</p>
+<p><a href="http://www.lamp.com/~user" target="_blank">http://www.lamp.com/~user</a></p>
+<h4 id="Apache_Rewrite_拟静态配置">Apache Rewrite 拟静态配置</h4>
+<p>1)mod_rewrite 简介和配置</p>
+<p>Rewirte主要的功能就是实现URL的跳转和隐藏真实地址，基于Perl语言的正则表达式规范。平时帮助我们实现拟静态，拟目录，域名跳转，防止盗链等</p>
+<p>2)apache配置rewrite</p>
+<p>支持httpd.conf 配置和目录 .htaccess配置</p>
+<p>a.启用rewrite</p>
+<pre><code><span class="preprocessor"># LoadModule rewrite_module            modules/mod_rewrite.so</span>
+去除前面的 <span class="preprocessor">#</span>
+LoadModule rewrite_module modules/mod_rewrite<span class="preprocessor">.so</span>
+</code></pre><p>b.启用.htaccess</p>
+<blockquote>
+<p>AllowOverride None    修改为:  AllowOverride All</p>
+</blockquote>
+<p>3)mod_rewrite 规则的使用(一般为了兼容性编写到.htaccess)</p>
+<pre><code><span class="constant">RewriteEngine</span> on               启动rewrite引擎
+
+<span class="constant">RewriteCond</span> <span class="string">%{HTTP_HOST}</span> !^www.lamp.com  [<span class="constant">NC</span>]          判断主机
+
+<span class="constant">RewriteRule</span>   ^<span class="regexp">/(.*) http:/</span><span class="regexp">/www.lamp.com/</span> [<span class="constant">L</span>]              跳转到
+
+<span class="constant">RewriteEngine</span> on                启动rewrite引擎
+<span class="constant">RewriteRule</span> ^<span class="regexp">/test([0-9]*).html$ /test</span>.php?id=<span class="variable">$1</span>
+<span class="constant">RewriteRule</span> ^<span class="regexp">/new([0-9]*)/</span><span class="variable">$ </span>/new.php?id=<span class="variable">$1</span> [<span class="constant">R</span>]            跳转到
+</code></pre><p>4)mod_rewrite 规则修正符</p>
+<blockquote>
+<p>a) R 强制外部重定向</p>
+<p>b) F 禁用URL,返回403HTTP状态码</p>
+<p>c) G 强制URL为GONE，返回410HTTP状态码</p>
+<p>d) P 强制使用代理转发</p>
+<p>e) L 表明当前规则是最后一条规则，停止分析以后规则的重写</p>
+<p>f) N 重新从第一条规则开始运行重写过程</p>
+<p>g) C 与下一条规则关联</p>
+<p>h) NS  只用于不是内部子请求</p>
+<p>i) NC 不区分大小写</p>
+<p>j) NE 不在输出转义特殊字符   \%3d$1  等价于 =$1</p>
+</blockquote>
+<p>5)apache rewrite日志功能</p>
+<pre><code>vi /etc/httpd/httpd.conf
+rewritelog /usr/<span class="built_in">local</span>/apache/logs/rewrite.<span class="built_in">log</span>  rewriteloglevel <span class="number">9</span>
+</code></pre><p>这样就可以把用apache做过的所有的rewrite过程全记录下来.</p>
+<p>当需要调试时请用rewritelog and rewriteloglevel 9联合,9为最大即得到最多的调试信息,最小为1，最小的调试信息，默认为0,没有调试信息</p>
+<p>6)应用案例</p>
+<p>a.将输入 en.lamp.com 的域名时跳转到www.lamp.com</p>
+<pre><code><span class="keyword"><span class="common">RewriteEngine</span></span> <span class="literal">on</span>
+<span class="keyword"><span class="common">RewriteCond</span></span> <span class="cbracket">%{HTTP_HOST}</span> ^en. lamp.com<span class="sqbracket"> [NC]</span>
+<span class="keyword"><span class="common">RewriteRule</span></span> ^(.*) http://www.lamp.com/<span class="sqbracket"> [L]</span>
+</code></pre><p>b. 将<a href="http://ss.kiya.cn/bbs/tread-60.html" target="_blank">http://ss.kiya.cn/bbs/tread-60.html</a>, 让它在新的域名下继续有效，点击后转发到<a href="http://bbs.lamp.com/index.html" target="_blank">http://bbs.lamp.com/index.html</a></p>
+<pre><code><span class="keyword"><span class="common">RewriteEngine</span></span> <span class="literal">On</span>
+<span class="keyword"><span class="common">RewriteCond</span></span> <span class="cbracket">%{REQUEST_URI}</span> ^/bbs/
+<span class="keyword"><span class="common">RewriteRule</span></span> ^bbs/(.*) http://bbs.lmap.com/<span class="number">$1</span><span class="sqbracket"> [L] </span>
+</code></pre>  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/apache/">apache</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.swanlinux.net/2013/02/12/linux_apache_setting/" data-title="Linux中的Apache配置 | Swan" data-tsina="1810958350" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2013/02/12/linux_cd_recover/" title="Linux 系统光盘修复">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Linux 系统光盘修复</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2013/02/12/linux_sudo_acl/"  title="Linux权限控制sudo/acl">
+ <strong>NEXT:</strong><br/> 
+ <span>Linux权限控制sudo/acl
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTPD服务的目录结构"><span class="toc-number">1.</span> <span class="toc-text">HTTPD服务的目录结构</span></a></li><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HTTPD安装的说明"><span class="toc-number">1.1.</span> <span class="toc-text">HTTPD安装的说明</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#按照上述安装APACHE的目录"><span class="toc-number">1.2.</span> <span class="toc-text">按照上述安装APACHE的目录</span></a></li></ol><li class="toc-item toc-level-3"><a class="toc-link" href="#构建基本可用的Web服务器"><span class="toc-number">2.</span> <span class="toc-text">构建基本可用的Web服务器</span></a></li><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#构建的步骤"><span class="toc-number">2.1.</span> <span class="toc-text">构建的步骤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#httpd-conf配置文件"><span class="toc-number">2.2.</span> <span class="toc-text">httpd.conf配置文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#httpd服务的访问控制"><span class="toc-number">2.3.</span> <span class="toc-text">httpd服务的访问控制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Apache虚拟目录"><span class="toc-number">2.4.</span> <span class="toc-text">Apache虚拟目录</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#构建虚拟Web主机"><span class="toc-number">2.5.</span> <span class="toc-text">构建虚拟Web主机</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#建立系统用户的个人主页"><span class="toc-number">2.6.</span> <span class="toc-text">建立系统用户的个人主页</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Apache_Rewrite_拟静态配置"><span class="toc-number">2.7.</span> <span class="toc-text">Apache Rewrite 拟静态配置</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/C 语言/" title="C 语言">C 语言<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/categories/linux/" title="linux">linux<sup>21</sup></a></li>
+		
+			<li><a href="/categories/php/" title="php">php<sup>5</sup></a></li>
+		
+			<li><a href="/categories/《C++ Primer Plus(第6版)》练习/" title="《C++ Primer Plus(第6版)》练习">《C++ Primer Plus(第6版)》练习<sup>2</sup></a></li>
+		
+			<li><a href="/categories/《unix 高级编程》-Note/" title="《unix 高级编程》-Note">《unix 高级编程》-Note<sup>9</sup></a></li>
+		
+			<li><a href="/categories/《快学scala》练习/" title="《快学scala》练习">《快学scala》练习<sup>16</sup></a></li>
+		
+			<li><a href="/categories/虚拟技术/" title="虚拟技术">虚拟技术<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05">五月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04">四月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10">十月 2014</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09">九月 2014</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04">四月 2014</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03">三月 2014</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02">二月 2014</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09">九月 2013</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05">五月 2013</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/02">二月 2013</a><span class="archive-list-count">20</span></li></ul>
+  </div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/C++/" title="C++">C++<sup>2</sup></a></li>
+		
+			<li><a href="/tags/GIT/" title="GIT">GIT<sup>1</sup></a></li>
+		
+			<li><a href="/tags/apache/" title="apache">apache<sup>1</sup></a></li>
+		
+			<li><a href="/tags/crontab at/" title="crontab at">crontab at<sup>1</sup></a></li>
+		
+			<li><a href="/tags/directory/" title="directory">directory<sup>1</sup></a></li>
+		
+			<li><a href="/tags/dns/" title="dns">dns<sup>1</sup></a></li>
+		
+			<li><a href="/tags/esxi/" title="esxi">esxi<sup>1</sup></a></li>
+		
+			<li><a href="/tags/extern/" title="extern">extern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/file io/" title="file io">file io<sup>3</sup></a></li>
+		
+			<li><a href="/tags/firewall/" title="firewall">firewall<sup>1</sup></a></li>
+		
+			<li><a href="/tags/ftp/" title="ftp">ftp<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hadoop/" title="hadoop">hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/tags/lvs/" title="lvs">lvs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/network/" title="network">network<sup>1</sup></a></li>
+		
+			<li><a href="/tags/newt/" title="newt">newt<sup>4</sup></a></li>
+		
+			<li><a href="/tags/nfs/" title="nfs">nfs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/process/" title="process">process<sup>4</sup></a></li>
+		
+			<li><a href="/tags/public/" title="public">public<sup>1</sup></a></li>
+		
+			<li><a href="/tags/quota/" title="quota">quota<sup>1</sup></a></li>
+		
+			<li><a href="/tags/raid lvm/" title="raid lvm">raid lvm<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<div style="float:left"><p> Hello ,I&#39;m Nmred. For now I&#39;m a phper. <br/>
+			Everything in order to facilitate</p></div>
+	 <div style="float:right">
+		<a target="_blank" href="http://weibo.com/u/1810958350?s=6uyXnP"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1810958350/614754d4/1.png"></a>
+	 </div>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/623713456" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/nmred" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://www.swanlinux.net" target="_blank" title="Nmred">Nmred</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    $('#toc.toc-aside').css('display', 'block');
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    $('#toc.toc-aside').css('display', 'none');
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','block');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"nmred"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fbc789c531e32acef9db0c8b33befe435' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+  </body>
+</html>

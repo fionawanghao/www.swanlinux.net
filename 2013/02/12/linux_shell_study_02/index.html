@@ -1,0 +1,614 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Linux 系统 Shell 编程二 | Swan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Nmred">
+    
+    <meta name="description" content="条件测试操作
+test命令
+用途：测试特定的表达式是否成立，当条件成立时，命令执行后的返回值为0，否则为其他数值
+格式：test 条件表达式 [ 条件表达式 ]
+常见的测试类型
+
+测试文件状态
+字符串比较
+整数值比较
+逻辑测试
+
+1.测试文件状态
+格式：[ 操作符 文件或目录 ]
+常用的测试操作符
+">
+    
+    
+    
+    
+    <link rel="alternative" href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" title="Swan" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="Swan" title="Swan"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Swan">Swan</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+						<li><a href="/tags">标签</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:www.swanlinux.net">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2013/02/12/linux_shell_study_02/" title="Linux 系统 Shell 编程二" itemprop="url">Linux 系统 Shell 编程二</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.swanlinux.net" title="Nmred">Nmred</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2013-02-12T10:13:16.000Z" itemprop="datePublished">2月 12 2013</time>
+    更新日期:<time datetime="2015-04-09T19:06:05.519Z" itemprop="dateModified">4月 10 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#条件测试操作"><span class="toc-number">1.</span> <span class="toc-text">条件测试操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Shell_编程中常见语法"><span class="toc-number">2.</span> <span class="toc-text">Shell 编程中常见语法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Shell_函数运用"><span class="toc-number">3.</span> <span class="toc-text">Shell 函数运用</span></a></li></ol>
+		</div>
+		
+		<h3 id="条件测试操作">条件测试操作</h3>
+<p><strong>test命令</strong></p>
+<p>用途：测试特定的表达式是否成立，当条件成立时，命令执行后的返回值为0，否则为其他数值</p>
+<p>格式：test 条件表达式 [ 条件表达式 ]</p>
+<p>常见的测试类型</p>
+<blockquote>
+<p>测试文件状态</p>
+<p>字符串比较</p>
+<p>整数值比较</p>
+<p>逻辑测试</p>
+</blockquote>
+<p>1.测试文件状态</p>
+<p>格式：[ 操作符 文件或目录 ]</p>
+<p>常用的测试操作符</p>
+<blockquote>
+<p>-d：测试是否为目录（Directory）</p>
+<p>-e：测试目录或文件是否存在（Exist）</p>
+<p>-f：测试是否为文件（File）</p>
+<p>-r：测试当前用户是否有权限读取（Read）</p>
+<p>-w：测试当前用户是否有权限写入（Write）</p>
+<p>-x：测试当前用户是否可执行（Excute）该文件</p>
+<p>-L：测试是否为符号连接（Link）文件 </p>
+</blockquote>
+<pre><code>[root<span class="variable">@localhost</span> ~]<span class="comment"># [ -d /etc/vsftpd ]</span>
+[root<span class="variable">@localhost</span> ~]<span class="comment"># echo $?</span>
+<span class="number">0</span>
+[root<span class="variable">@localhost</span> ~]<span class="comment"># [ -d /etc/hosts ]</span>
+[root<span class="variable">@localhost</span> ~]<span class="comment"># echo $?</span>
+<span class="number">1</span> 
+</code></pre><hr>
+<pre><code>[root<span class="variable">@localhost</span> ~]<span class="comment"># [ -e /media/cdrom ] &amp;&amp; echo “YES”</span>
+<span class="constant">YES</span>
+[root<span class="variable">@localhost</span> ~]<span class="comment"># [ -e /media/cdrom/Server ] &amp;&amp; echo “YES“</span>
+[root<span class="variable">@localhost</span> ~]<span class="comment"># </span>
+</code></pre><p>2、整数值比较</p>
+<p>格式：[ 整数1 操作符 整数2 ]</p>
+<p>常用的测试操作符</p>
+<blockquote>
+<p>-eq：等于（Equal）</p>
+<p>-ne：不等于（Not Equal）</p>
+<p>-gt：大于（Greater Than）</p>
+<p>-lt：小于（Lesser Than）</p>
+<p>-le：小于或等于（Lesser or Equal）</p>
+<p>-ge：大于或等于（Greater or Equal）</p>
+</blockquote>
+<pre><code>[root<span class="variable">@localhost</span> ~]<span class="comment"># who | wc -l</span>
+<span class="number">5</span>
+[root<span class="variable">@localhost</span> ~]<span class="comment"># [ `who | wc -l` -le 10 ] &amp;&amp; echo “YES”</span>
+<span class="constant">YES</span> 
+</code></pre><hr>
+<pre><code>[root<span class="variable">@localhost</span> ~]# df -hT | grep “/boot” | awk ‘{<span class="keyword">print</span> <span class="variable">$6</span>}’
+<span class="number">12</span>%
+[root<span class="variable">@localhost</span> ~]# BootUsage=<span class="string">`df -hT | grep “/boot” | awk ‘{print $6}’ | cut -d “%” -f 1`</span>
+[root<span class="variable">@localhost</span> ~]# echo <span class="variable">$BootUsage</span>
+<span class="number">12</span>
+[root<span class="variable">@localhost</span> ~]# [ <span class="variable">$BootUsage</span> -gt <span class="number">95</span> ] &amp;&amp; echo “YES” 
+</code></pre><p>3.字符串比较</p>
+<p>格式：[ 字符串1 = 字符串2 ]</p>
+<p>[ 字符串1 != 字符串2 ]</p>
+<p>[ -z 字符串 ]</p>
+<p>常用的测试操作符</p>
+<blockquote>
+<p>=：字符串内容相同</p>
+<p>!=：字符串内容不同，! 号表示相反的意思</p>
+<p>-z：字符串内容为空 </p>
+</blockquote>
+<pre><code>[root<span class="variable">@localhost</span> ~]<span class="comment"># read -p “Location：” FilePath</span>
+<span class="constant">Location</span>：/etc/inittab
+[root<span class="variable">@localhost</span> ~]<span class="comment"># [ $FilePath = "/etc/inittab" ] &amp;&amp; echo “YES”</span>
+<span class="constant">YES</span> 
+</code></pre><hr>
+<pre><code>[root<span class="variable">@localhost</span> ~]# [ <span class="variable">$LANG</span> != <span class="string">"en.US"</span> ] &amp;&amp; echo <span class="variable">$LANG</span>
+zh_CN.UTF-<span class="number">8</span> 
+</code></pre><p>4.逻辑测试</p>
+<p>格式：[ 表达式1 ] 操作符 [ 表达式2 ] …</p>
+<p>常用的测试操作符</p>
+<blockquote>
+<p>-a或&amp;&amp;：逻辑与，“而且”的意思</p>
+<p> 前后两个表达式都成立时整个测试结果才为真，否则为假</p>
+<p>-o或||：逻辑或，“或者”的意思</p>
+<p> 操作符两边至少一个为真时，结果为真，否则结果为假</p>
+<p>!：逻辑否</p>
+<p> 当指定的条件不成立时，返回结果为真</p>
+</blockquote>
+<pre><code>[root<span class="variable">@localhost</span> ~]# echo <span class="variable">$USER</span>
+root
+[root<span class="variable">@localhost</span> ~]# [ <span class="variable">$USER</span> != <span class="string">"teacher"</span> ] &amp;&amp; echo “Not teacher”
+Not teacher
+[root<span class="variable">@localhost</span> ~]# [ <span class="variable">$USER</span> = <span class="string">"teacher"</span> ] || echo “Not teacher”
+Not teacher 
+</code></pre><h3 id="Shell_编程中常见语法">Shell 编程中常见语法</h3>
+<p>1、if条件语句 — 单分支</p>
+<p>应用示例：</p>
+<p>如果/boot分区的空间使用超过80%，输出报警信息</p>
+<p>2、if条件语句 — 双分支</p>
+<p>应用示例：</p>
+<p>判断mysqld是否在运行，若已运行则输出提示信息，否则重新启动mysqld服务</p>
+<p>3、if条件语句 — 多分支</p>
+<pre><code><span class="keyword">if</span> 条件测试命令<span class="number">1</span>; then
+    命令序列<span class="number">1</span>
+elif 条件测试命令<span class="number">2</span>; then
+    命令序列<span class="number">2</span>
+elif <span class="keyword">...</span>
+<span class="keyword">else</span>
+    命令序列n
+fi
+</code></pre><p>4、for循环语句</p>
+<p>应用示例1：</p>
+<blockquote>
+<p>依次输出3条文字信息，包括一天中的“Morning”、“Noon”、“Evening”字串</p>
+</blockquote>
+<p>应用示例2：</p>
+<blockquote>
+<p>对于使用“/bin/bash”作为登录Shell的系统用户，检查他们在“/opt”目录中拥有的子目录或文件数量，如果超过100个，则列出具体个数及对应的用户帐号</p>
+</blockquote>
+<p>5、while循环语句</p>
+<p>应用示例1：</p>
+<blockquote>
+<p>批量添加20个系统用户帐号， 用户名依次为“stu1”、“stu2”、……、“stu20”</p>
+<p>这些用户的初始密码均设置为“123456”</p>
+</blockquote>
+<p>应用示例2：</p>
+<blockquote>
+<p>批量删除上例中添加的20个系统用户帐号 </p>
+</blockquote>
+<p>6、case多重分支语句</p>
+<p><img src="/image/linux/linux-shell-switch-002.png" alt="swicth"></p>
+<p>应用示例1：</p>
+<blockquote>
+<p>编写脚本文件 mydb.sh，用于控制系统服务mysqld</p>
+<p>当执行 ./mydb.sh start 时，启动mysqld服务</p>
+<p>当执行 ./mydb.sh stop 时，关闭mysqld服务</p>
+<p>如果输入其他脚本参数，则显示帮助信息</p>
+</blockquote>
+<p>应用示例2：</p>
+<blockquote>
+<p>提示用户从键盘输入一个字符，判断该字符是否为字母、数字或者其它字符，并输出相应的提示信息</p>
+</blockquote>
+<p>7、shift迁移语句</p>
+<p>用于迁移位置变量，将 $1~$9 依次向左传递</p>
+<blockquote>
+<p>1）例如，若当前脚本程序获得的位置变量如下：</p>
+<pre><code> <span class="variable">$1</span>=file1、<span class="variable">$2</span>=file2、<span class="variable">$3</span>=file3、<span class="variable">$4</span>=file4
+</code></pre><p>2）则执行一次shift命令后，各位置变量为：</p>
+<pre><code> <span class="variable">$1</span>=file2、<span class="variable">$2</span>=file3、<span class="variable">$3</span>=file4
+</code></pre><p>3）再次执行shift命令后，各位置变量为：</p>
+<pre><code><span class="variable">$1</span>=file3、<span class="variable">$2</span>=file4
+</code></pre></blockquote>
+<p>应用示例：</p>
+<blockquote>
+<p>通过命令行参数传递多个整数值，并计算总和</p>
+</blockquote>
+<p>8、循环控制语句</p>
+<p>a.break语句</p>
+<p>在for、while、until等循环语句中，用于跳出当前所在的循环体，执行循环体后的语句</p>
+<p>b.continue 语句</p>
+<p>在for、while、until等循环语句中，用于跳过循环体内余下的语句，重新判断条件以便执行下一次循环 </p>
+<h3 id="Shell_函数运用">Shell 函数运用</h3>
+<p><img src="/image/linux/linux-shell-function-002.png" alt="函数"></p>
+<p>应用示例：</p>
+<blockquote>
+<p>在脚本中定义一个加法函数，用于计算2个整数的和</p>
+<p>调用该函数计算（12+34）、（56+789）的和</p>
+</blockquote>
+<pre><code>[root<span class="variable">@localhost</span> ~]<span class="comment"># sh adderfun.sh</span>
+<span class="number">46</span>
+<span class="number">845</span> 
+</code></pre>  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/shell/">shell</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.swanlinux.net/2013/02/12/linux_shell_study_02/" data-title="Linux 系统 Shell 编程二 | Swan" data-tsina="1810958350" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2013/02/12/linux_special_permission_setting/" title="Linux 中特殊权限为设置">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Linux 中特殊权限为设置</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2013/02/12/linux_raid_lvm/"  title="Linux系统中的RAID和LVM">
+ <strong>NEXT:</strong><br/> 
+ <span>Linux系统中的RAID和LVM
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#条件测试操作"><span class="toc-number">1.</span> <span class="toc-text">条件测试操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Shell_编程中常见语法"><span class="toc-number">2.</span> <span class="toc-text">Shell 编程中常见语法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Shell_函数运用"><span class="toc-number">3.</span> <span class="toc-text">Shell 函数运用</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/C 语言/" title="C 语言">C 语言<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/categories/linux/" title="linux">linux<sup>21</sup></a></li>
+		
+			<li><a href="/categories/php/" title="php">php<sup>5</sup></a></li>
+		
+			<li><a href="/categories/《C++ Primer Plus(第6版)》练习/" title="《C++ Primer Plus(第6版)》练习">《C++ Primer Plus(第6版)》练习<sup>2</sup></a></li>
+		
+			<li><a href="/categories/《unix 高级编程》-Note/" title="《unix 高级编程》-Note">《unix 高级编程》-Note<sup>9</sup></a></li>
+		
+			<li><a href="/categories/《快学scala》练习/" title="《快学scala》练习">《快学scala》练习<sup>16</sup></a></li>
+		
+			<li><a href="/categories/虚拟技术/" title="虚拟技术">虚拟技术<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05">五月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04">四月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10">十月 2014</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09">九月 2014</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04">四月 2014</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03">三月 2014</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02">二月 2014</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09">九月 2013</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05">五月 2013</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/02">二月 2013</a><span class="archive-list-count">20</span></li></ul>
+  </div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/C++/" title="C++">C++<sup>2</sup></a></li>
+		
+			<li><a href="/tags/GIT/" title="GIT">GIT<sup>1</sup></a></li>
+		
+			<li><a href="/tags/apache/" title="apache">apache<sup>1</sup></a></li>
+		
+			<li><a href="/tags/crontab at/" title="crontab at">crontab at<sup>1</sup></a></li>
+		
+			<li><a href="/tags/directory/" title="directory">directory<sup>1</sup></a></li>
+		
+			<li><a href="/tags/dns/" title="dns">dns<sup>1</sup></a></li>
+		
+			<li><a href="/tags/esxi/" title="esxi">esxi<sup>1</sup></a></li>
+		
+			<li><a href="/tags/extern/" title="extern">extern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/file io/" title="file io">file io<sup>3</sup></a></li>
+		
+			<li><a href="/tags/firewall/" title="firewall">firewall<sup>1</sup></a></li>
+		
+			<li><a href="/tags/ftp/" title="ftp">ftp<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hadoop/" title="hadoop">hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/tags/lvs/" title="lvs">lvs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/network/" title="network">network<sup>1</sup></a></li>
+		
+			<li><a href="/tags/newt/" title="newt">newt<sup>4</sup></a></li>
+		
+			<li><a href="/tags/nfs/" title="nfs">nfs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/process/" title="process">process<sup>4</sup></a></li>
+		
+			<li><a href="/tags/public/" title="public">public<sup>1</sup></a></li>
+		
+			<li><a href="/tags/quota/" title="quota">quota<sup>1</sup></a></li>
+		
+			<li><a href="/tags/raid lvm/" title="raid lvm">raid lvm<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<div style="float:left"><p> Hello ,I&#39;m Nmred. For now I&#39;m a phper. <br/>
+			Everything in order to facilitate</p></div>
+	 <div style="float:right">
+		<a target="_blank" href="http://weibo.com/u/1810958350?s=6uyXnP"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1810958350/614754d4/1.png"></a>
+	 </div>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/623713456" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/nmred" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://www.swanlinux.net" target="_blank" title="Nmred">Nmred</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    $('#toc.toc-aside').css('display', 'block');
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    $('#toc.toc-aside').css('display', 'none');
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','block');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"nmred"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fbc789c531e32acef9db0c8b33befe435' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+  </body>
+</html>

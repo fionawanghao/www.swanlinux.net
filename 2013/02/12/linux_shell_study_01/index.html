@@ -1,0 +1,621 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Linux 系统 Shell 编程一 | Swan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Nmred">
+    
+    <meta name="description" content="Shell 变量
+用户自定义变量：由用户自己定义、修改和使用
+
+环境变量：由系统维护，用于设置用户的Shell工作环境，只有极少数的变量用户可以修改
+预定义变量：Bash预定义的特殊变量，不能直接修改
+位置变量：通过命令行给程序传递执行参数
+
+变量的赋值与引用
+a.定义新的变量
+变量名要以英文字母或">
+    
+    
+    
+    
+    <link rel="alternative" href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" title="Swan" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="Swan" title="Swan"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Swan">Swan</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+						<li><a href="/tags">标签</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:www.swanlinux.net">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2013/02/12/linux_shell_study_01/" title="Linux 系统 Shell 编程一" itemprop="url">Linux 系统 Shell 编程一</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.swanlinux.net" title="Nmred">Nmred</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2013-02-12T10:13:16.000Z" itemprop="datePublished">2月 12 2013</time>
+    更新日期:<time datetime="2015-04-09T19:06:05.519Z" itemprop="dateModified">4月 10 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Shell_变量"><span class="toc-number">1.</span> <span class="toc-text">Shell 变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Shell编程"><span class="toc-number">2.</span> <span class="toc-text">Shell编程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Shell编程实例"><span class="toc-number">3.</span> <span class="toc-text">Shell编程实例</span></a></li></ol>
+		</div>
+		
+		<h3 id="Shell_变量">Shell 变量</h3>
+<p>用户自定义变量：由用户自己定义、修改和使用</p>
+<ul>
+<li>环境变量：由系统维护，用于设置用户的Shell工作环境，只有极少数的变量用户可以修改</li>
+<li>预定义变量：Bash预定义的特殊变量，不能直接修改</li>
+<li>位置变量：通过命令行给程序传递执行参数</li>
+</ul>
+<p><strong>变量的赋值与引用</strong></p>
+<p>a.定义新的变量</p>
+<p>变量名要以英文字母或下划线开头，区分大小写</p>
+<p>格式：变量名=变量值</p>
+<p>b.查看变量的值</p>
+<p>格式：echo $变量名</p>
+<pre><code>[root<span class="variable">@swan</span> ~]<span class="comment"># DAY="SunDay"</span>
+[root<span class="variable">@swan</span> ~]<span class="comment"># echo DAY</span>
+<span class="constant">DAY</span>
+[root<span class="variable">@swan</span> ~]<span class="comment">#</span>
+</code></pre><p>c.从键盘输入内容为变量赋值</p>
+<p>格式： read [-p “信息”] 变量名</p>
+<p>d.结合不同的引号为变量赋值</p>
+<p>双引号 “ ” ：允许通过$符号引用其他变量值</p>
+<p>单引号 ‘ ’ ：禁止引用其他变量值，$视为普通字符</p>
+<p>反撇号 ` ` ：将命令执行的结果输出给变量</p>
+<pre><code><span class="shebang">#!/bin/bash
+</span>
+<span class="built_in">read</span> -p <span class="string">"Please input a username:"</span> USERNAME
+
+<span class="built_in">echo</span> <span class="variable">$USERNAME</span>
+
+<span class="built_in">echo</span> <span class="string">"------------------"</span>
+
+<span class="built_in">echo</span> <span class="string">"<span class="variable">$USERNAME</span>"</span>
+
+<span class="built_in">echo</span> <span class="string">'$USERNAME'</span>
+
+<span class="built_in">echo</span> `<span class="built_in">pwd</span>`
+</code></pre><p>运行结果：</p>
+<pre><code>[root@swan ~]# ./var1.sh
+Please input a username:nmred
+<span class="header">nmred
+------------------</span>
+nmred
+$username
+/root
+[root@swan ~]#
+</code></pre><p>e.设置变量的作用范围</p>
+<p>格式：export 变量名…</p>
+<p>export 变量名=变量值 […变量名n=变量值n]</p>
+<p>f.清除用户定义的变量</p>
+<p>格式：unset 变量名</p>
+<pre><code>[root<span class="variable">@swan</span> ~]<span class="comment"># set | grep str1</span>
+[root<span class="variable">@swan</span> ~]<span class="comment"># str1="nmredtest"</span>
+[root<span class="variable">@swan</span> ~]<span class="comment"># set | grep str1</span>
+str1=nmredtest
+[root<span class="variable">@swan</span> ~]<span class="comment"># echo $str1</span>
+nmredtest
+[root<span class="variable">@swan</span> ~]<span class="comment"># export str1</span>
+[root<span class="variable">@swan</span> ~]<span class="comment"># env |grep str1</span>
+str1=nmredtest
+[root<span class="variable">@swan</span> ~]<span class="comment"># unset str1</span>
+[root<span class="variable">@swan</span> ~]<span class="comment"># echo $str1</span>
+
+[root<span class="variable">@swan</span> ~]<span class="comment">#</span>
+</code></pre><p>g.数值变量的运算</p>
+<p>格式：expr 变量1 运算符 变量2 …[运算符 变量n]</p>
+<p>expr的常用运算符</p>
+<p>加法运算：+</p>
+<p>减法运算： -</p>
+<p>乘法运算： *</p>
+<p>除法运算： /</p>
+<p>求模（取余）运算： %</p>
+<pre><code>[root<span class="variable">@swan</span> ~]<span class="comment"># expr 2 + 4</span>
+<span class="number">6</span>
+[root<span class="variable">@swan</span> ~]<span class="comment"># expr 2 - 4</span>
+-<span class="number">2</span>
+[root<span class="variable">@swan</span> ~]<span class="comment"># expr 2 \* 4</span>
+<span class="number">8</span>
+[root<span class="variable">@swan</span> ~]<span class="comment"># expr 2 / 4</span>
+<span class="number">0</span>
+[root<span class="variable">@swan</span> ~]<span class="comment"># expr 2 % 4</span>
+<span class="number">2</span>
+[root<span class="variable">@swan</span> ~]<span class="comment">#</span>
+</code></pre><p><strong>环境变量</strong></p>
+<p>a.环境变量配置文件</p>
+<blockquote>
+<p>全局配置文件：/etc/profile</p>
+<p>用户配置文件：~/.bash_profile</p>
+</blockquote>
+<p>b.查看环境变量</p>
+<blockquote>
+<p>set命令可以查看所有的Shell变量，其中包括环境变量</p>
+</blockquote>
+<p>c.常见的环境变量：</p>
+<blockquote>
+<p>$USER 、$LOGNAME</p>
+<p>$UID 、 $SHELL 、$HOME</p>
+<p>$PWD、 $PATH</p>
+<p>$PS1、$PS2</p>
+</blockquote>
+<p>其中PS1是[\u@\h \W]\$设置这个变量可以调整命令行前缀</p>
+<pre><code>[root<span class="variable">@swan</span> ~]<span class="comment"># echo $USER</span>
+root
+[root<span class="variable">@swan</span> ~]<span class="comment"># echo $PATH</span>
+/usr/kerberos/<span class="symbol">sbin:</span>/usr/kerberos/<span class="symbol">bin:</span>/usr/local/<span class="symbol">sbin:</span>/usr/local/<span class="symbol">bin:</span>/<span class="symbol">sbin:</span>/<span class="symbol">bin:</span>/usr/<span class="symbol">sbin:</span>/usr/<span class="symbol">bin:</span>/root/bin
+[root<span class="variable">@swan</span> ~]<span class="comment"># echo $PS1</span>
+[\u@\h \<span class="constant">W</span>]\<span class="variable">$
+</span>[root<span class="variable">@swan</span> ~]<span class="comment"># PS1="[\\W]\\$"</span>
+[~]<span class="comment">#</span>
+[~]<span class="comment">#</span>
+[~]<span class="comment">#PS1="[\u@\h \W]\$"</span>
+[root<span class="variable">@swan</span> ~]$
+</code></pre><p><strong>位置变量</strong></p>
+<p>表示为 $n，n为1~9之间的数字</p>
+<pre><code>[root<span class="variable">@swan</span> ~]<span class="variable">$.</span>/exam01 one two three four five six
+</code></pre><p><strong>预定义变量</strong></p>
+<p>表示形式如下</p>
+<blockquote>
+<p>$#：命令行中位置参数的个数</p>
+<p>$*：所有位置参数的内容</p>
+<p>$?：上一条命令执行后返回的状态，当返回状态值为0时表示执行正常，非0值表示执行异常或出错</p>
+<p>$$：当前所在进程的进程号</p>
+<p>$!：后台运行的最后一个进程号</p>
+<p>$0：当前执行的进程/程序名</p>
+</blockquote>
+<h3 id="Shell编程">Shell编程</h3>
+<p>1、编写可执行的Shell脚本</p>
+<p>a.建立包含执行语句的脚本文件</p>
+<p>脚本文件中包括的内容</p>
+<blockquote>
+<p>运行环境设置：#!/bin/bash</p>
+<p>注释信息：以#开始的说明性文字</p>
+<p>可执行的Linux命令行</p>
+</blockquote>
+<p>b.为脚本文件添加可执行权限</p>
+<pre><code>[root@localhost ~]<span class="comment"># vi repboot.sh</span>
+<span class="shebang">#!/bin/bash</span>
+<span class="comment"># To show usage of /boot directory and mode of kernel file.</span>
+<span class="built_in">echo</span> “Useage of /boot: ”
+du -sh /boot
+<span class="built_in">echo</span> “The mode of kernel file:”
+ls -lh /boot/vmlinuz-*
+[root@localhost ~]<span class="comment"># chmod a+x repboot.sh</span>
+</code></pre><p>c.运行Shell脚本程序</p>
+<p>1).直接执行具有“x”权限的脚本文件</p>
+<p>例如：./repboot.sh</p>
+<p>2).使用指定的解释器程序执行脚本内容</p>
+<p>例如：bash repboot.sh、sh repboot.sh</p>
+<p>3).通过source命令（或 . ）读取脚本内容执行</p>
+<p>例如：souce repboot.sh 或 . hello.sh</p>
+<h3 id="Shell编程实例">Shell编程实例</h3>
+<p>1.每周五17:30清理FTP服务器的公共共享目录检查 /var/ftp/pub/ 目录，将其中所有子目录及文件的详细列表、当时的时间信息追加保存到 /var/log/pubdir.log 日志文件中，然后清空该目录</p>
+<pre><code>[root@localhost ~]<span class="comment"># vi /opt/ftpclean.sh</span>
+<span class="shebang">#!/bin/bash</span>
+date &gt;&gt; /var/log/pubdir.log
+ls -lhR /var/ftp/pub &gt;&gt; /var/log/pubdir.log
+rm -rf /var/ftp/pub/*
+[root@localhost ~]<span class="comment"># crontab -e</span>
+<span class="number">30</span> <span class="number">17</span> * * <span class="number">5</span> /opt/ftpclean.sh
+</code></pre><p>2.每隔3天对数据库目录做一次完整备份</p>
+<blockquote>
+<p>统计 /var/lib/mysql 目录占用的空间大小、查看当前的日期，并记录到临时文件 /tmp/dbinfo.txt 中</p>
+<p>将 /tmp/dbinfo.txt 文件、/var/lib/mysql 目录进行压缩归档，备份到/opt/dbbak/目录中</p>
+<p>备份后的包文件名中要包含当天的日期信息</p>
+<p>最后删除临时文件/tmp/dbinfo.txt</p>
+</blockquote>
+<pre><code>[root@localhost ~]<span class="comment"># vi /opt/dbbak.sh</span>
+
+<span class="shebang">#!/bin/bash
+</span>
+DAY=`date +%Y%m%d`
+SIZE=`du -sh /var/lib/mysql`
+<span class="built_in">echo</span> “Date: <span class="variable">$DAY</span>” &gt;&gt;\&gt; tmp/dbinfo.txt
+<span class="built_in">echo</span> “Data Size: <span class="variable">$SIZE</span>” &gt;&gt; /tmp/dbinfo.txt
+<span class="built_in">cd</span> /opt/dbbak
+tar zcvf mysqlbak-<span class="variable">${DAY}</span>.tar.gz /var/lib/mysql /tmp/dbinfo.txt
+rm <span class="operator">-f</span> /tmp/dbinfo.txt
+
+root@localhost ~]<span class="comment"># crontab -e</span>
+<span class="number">55</span> <span class="number">23</span> */<span class="number">3</span> * * /opt/dbbak.sh
+</code></pre>  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/shell/">shell</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.swanlinux.net/2013/02/12/linux_shell_study_01/" data-title="Linux 系统 Shell 编程一 | Swan" data-tsina="1810958350" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2013/02/12/linux_firewall_setting/" title="Linux系统中防火墙配置">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Linux系统中防火墙配置</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2013/02/12/linux_special_permission_setting/"  title="Linux 中特殊权限为设置">
+ <strong>NEXT:</strong><br/> 
+ <span>Linux 中特殊权限为设置
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Shell_变量"><span class="toc-number">1.</span> <span class="toc-text">Shell 变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Shell编程"><span class="toc-number">2.</span> <span class="toc-text">Shell编程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Shell编程实例"><span class="toc-number">3.</span> <span class="toc-text">Shell编程实例</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/C 语言/" title="C 语言">C 语言<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/categories/linux/" title="linux">linux<sup>21</sup></a></li>
+		
+			<li><a href="/categories/php/" title="php">php<sup>5</sup></a></li>
+		
+			<li><a href="/categories/《C++ Primer Plus(第6版)》练习/" title="《C++ Primer Plus(第6版)》练习">《C++ Primer Plus(第6版)》练习<sup>2</sup></a></li>
+		
+			<li><a href="/categories/《unix 高级编程》-Note/" title="《unix 高级编程》-Note">《unix 高级编程》-Note<sup>9</sup></a></li>
+		
+			<li><a href="/categories/《快学scala》练习/" title="《快学scala》练习">《快学scala》练习<sup>16</sup></a></li>
+		
+			<li><a href="/categories/虚拟技术/" title="虚拟技术">虚拟技术<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05">五月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04">四月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10">十月 2014</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09">九月 2014</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04">四月 2014</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03">三月 2014</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02">二月 2014</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09">九月 2013</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05">五月 2013</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/02">二月 2013</a><span class="archive-list-count">20</span></li></ul>
+  </div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/C++/" title="C++">C++<sup>2</sup></a></li>
+		
+			<li><a href="/tags/GIT/" title="GIT">GIT<sup>1</sup></a></li>
+		
+			<li><a href="/tags/apache/" title="apache">apache<sup>1</sup></a></li>
+		
+			<li><a href="/tags/crontab at/" title="crontab at">crontab at<sup>1</sup></a></li>
+		
+			<li><a href="/tags/directory/" title="directory">directory<sup>1</sup></a></li>
+		
+			<li><a href="/tags/dns/" title="dns">dns<sup>1</sup></a></li>
+		
+			<li><a href="/tags/esxi/" title="esxi">esxi<sup>1</sup></a></li>
+		
+			<li><a href="/tags/extern/" title="extern">extern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/file io/" title="file io">file io<sup>3</sup></a></li>
+		
+			<li><a href="/tags/firewall/" title="firewall">firewall<sup>1</sup></a></li>
+		
+			<li><a href="/tags/ftp/" title="ftp">ftp<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hadoop/" title="hadoop">hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/tags/lvs/" title="lvs">lvs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/network/" title="network">network<sup>1</sup></a></li>
+		
+			<li><a href="/tags/newt/" title="newt">newt<sup>4</sup></a></li>
+		
+			<li><a href="/tags/nfs/" title="nfs">nfs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/process/" title="process">process<sup>4</sup></a></li>
+		
+			<li><a href="/tags/public/" title="public">public<sup>1</sup></a></li>
+		
+			<li><a href="/tags/quota/" title="quota">quota<sup>1</sup></a></li>
+		
+			<li><a href="/tags/raid lvm/" title="raid lvm">raid lvm<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<div style="float:left"><p> Hello ,I&#39;m Nmred. For now I&#39;m a phper. <br/>
+			Everything in order to facilitate</p></div>
+	 <div style="float:right">
+		<a target="_blank" href="http://weibo.com/u/1810958350?s=6uyXnP"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1810958350/614754d4/1.png"></a>
+	 </div>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/623713456" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/nmred" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://www.swanlinux.net" target="_blank" title="Nmred">Nmred</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    $('#toc.toc-aside').css('display', 'block');
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    $('#toc.toc-aside').css('display', 'none');
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','block');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"nmred"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fbc789c531e32acef9db0c8b33befe435' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+  </body>
+</html>

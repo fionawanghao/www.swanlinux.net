@@ -1,0 +1,884 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>《快学scala》第五章 类 | Swan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Nmred">
+    
+    <meta name="description" content="\1. 改进5.1节的Counter类，让它不要在Int.MaxValue时变成负数。
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+object TestC {
+  def main(args : Array[String]) {">
+    
+    
+    
+    
+    <link rel="alternative" href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" title="Swan" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="Swan" title="Swan"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Swan">Swan</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+						<li><a href="/tags">标签</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:www.swanlinux.net">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/09/08/scala_note_5/" title="《快学scala》第五章 类" itemprop="url">《快学scala》第五章 类</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.swanlinux.net" title="Nmred">Nmred</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-09-08T02:56:16.000Z" itemprop="datePublished">9月 8 2014</time>
+    更新日期:<time datetime="2015-04-09T19:06:05.521Z" itemprop="dateModified">4月 10 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+		</div>
+		
+		<p>\1. 改进5.1节的Counter类，让它不要在Int.MaxValue时变成负数。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+</pre></td><td class="code"><pre><span class="class"><span class="keyword">object</span> <span class="title">TestC</span> {</span>
+  <span class="keyword">def</span> main(args : Array[String]) {
+    <span class="keyword">val</span> count = <span class="keyword">new</span> Counter();
+    <span class="keyword">for</span> (_ &lt;- <span class="number">1</span> to Int.MaxValue) {
+      count.increment();
+    }
+    println(count.current)
+  }
+}
+
+<span class="class"><span class="keyword">class</span> <span class="title">Counter</span></span>
+{ 
+  <span class="keyword">private</span> <span class="keyword">var</span> value = <span class="number">0</span>
+  
+  <span class="keyword">def</span> increment() { 
+    <span class="keyword">if</span> ((value + <span class="number">1</span>).isValidInt) {
+      value += <span class="number">1</span>
+    }
+  }
+  
+  <span class="keyword">def</span> current() = value
+}
+</pre></td></tr></table></figure>
+
+<p>\2. 编写一个BankAccount类，加入deposit和withdraw方法，和一个只读的balance属性。  </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre></td><td class="code"><pre><span class="class"><span class="keyword">object</span> <span class="title">TestC</span> {</span>
+  <span class="keyword">def</span> main(args : Array[String]) {
+    <span class="keyword">val</span> bank = <span class="keyword">new</span> BankAccount(<span class="number">200</span>);
+    bank.deposit
+    bank.withdraw
+    println(bank.balance)
+  }
+}
+
+<span class="class"><span class="keyword">class</span> <span class="title">BankAccount</span><span class="params">(val balance : Int)</span></span>
+{
+  <span class="keyword">def</span> deposit = {
+    println(<span class="string">"deposit function"</span>);
+  }
+
+  <span class="keyword">def</span> withdraw = {
+    println(<span class="string">"withdraw function"</span>);
+  }
+}
+</pre></td></tr></table></figure>
+
+<p>\3. 编写一个Time类，加入只读属性hours和minutes，和一个检查某一时刻是否早于另一时刻的方法before(other: Time): boolean。Time对象应该以new Time(hrs, min)方式构建，其中hrs小时数以军用时间格式呈现（介于0和23之间）。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+</pre></td><td class="code"><pre><span class="keyword">package</span> net.swanlinux.www.test
+
+<span class="class"><span class="keyword">object</span> <span class="title">TestC</span> {</span>
+  <span class="keyword">def</span> main(args : Array[String]) {
+    <span class="keyword">val</span> time = <span class="keyword">new</span> Time(<span class="number">23</span>, <span class="number">9</span>);
+    println(time.before(<span class="keyword">new</span> Time(<span class="number">23</span>, <span class="number">10</span>)))
+  } 
+} 
+
+<span class="class"><span class="keyword">class</span> <span class="title">Time</span><span class="params">(private var hrs : Int, private var min : Int)</span></span>
+{
+  <span class="comment">// 格式化合法的时间</span>
+  hrs = hrs % <span class="number">24</span>
+  min = min % <span class="number">60</span>
+  
+  <span class="keyword">def</span> before(other : Time) : Boolean = {
+    other.hours &gt; <span class="keyword">this</span>.hours || (other.hours == <span class="keyword">this</span>.hours && other.minutes &gt; <span class="keyword">this</span>.minutes)
+  } 
+  
+  <span class="keyword">def</span> hours = hrs
+  
+  <span class="keyword">def</span> minutes = min
+}
+</pre></td></tr></table></figure>
+
+<p>\4. 重新实现前一个练习中的Time类，将内部呈现改成自午夜起的分钟数（介于0到24x60-1之间）。不要改变公有接口。也就是说，客户端代码不应因你的修改而受影响。 </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+</pre></td><td class="code"><pre><span class="keyword">package</span> net.swanlinux.www.test
+
+<span class="class"><span class="keyword">object</span> <span class="title">TestC</span> {</span>
+  <span class="keyword">def</span> main(args : Array[String]) {
+    <span class="keyword">val</span> time = <span class="keyword">new</span> Time(<span class="number">23</span>, <span class="number">9</span>);
+    println(time.before(<span class="keyword">new</span> Time(<span class="number">23</span>, <span class="number">10</span>)))
+  } 
+} 
+
+<span class="class"><span class="keyword">class</span> <span class="title">Time</span><span class="params">(private var hrs : Int, private var min : Int)</span></span>
+{
+  <span class="comment">// 格式化合法的时间</span>
+  hrs = hrs % <span class="number">24</span>
+  min = min % <span class="number">60</span>
+  
+  <span class="keyword">def</span> before(other : Time) : Boolean = {
+    other.total &gt; <span class="keyword">this</span>.total
+  }                     
+                        
+  <span class="keyword">def</span> hours = hrs
+
+  <span class="keyword">def</span> minutes = min
+
+  <span class="keyword">def</span> total = (hrs * <span class="number">60</span> + min)
+}
+</pre></td></tr></table></figure>
+
+<p>\5. 创建一个Student类，加入可读写的JavaBeans属性name(类型为String)和id(类型为Long)。 </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre></td><td class="code"><pre><span class="keyword">package</span> net.swanlinux.www.test
+<span class="keyword">import</span> scala.reflect.BeanProperty
+
+<span class="class"><span class="keyword">object</span> <span class="title">TestC</span> {</span>
+  <span class="keyword">def</span> main(args : Array[String]) {
+    <span class="keyword">val</span> stu = <span class="keyword">new</span> Student(<span class="string">"test"</span>, <span class="number">4000</span>)
+    println(stu.getName);
+    println(stu.getId);
+  }
+} 
+
+<span class="class"><span class="keyword">class</span> <span class="title">Student</span><span class="params">(<span class="annotation">@BeanProperty</span> var name : String, <span class="annotation">@BeanProperty</span> var id : Long)</span></span>
+{
+}
+</pre></td></tr></table></figure>
+
+<p>\6. 在5.2节的Person类中提供一个主构造器，将负年龄转换为0。 </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+</pre></td><td class="code"><pre><span class="keyword">package</span> net.swanlinux.www.test
+
+<span class="class"><span class="keyword">object</span> <span class="title">TestC</span> {</span>
+  <span class="keyword">def</span> main(args : Array[String]) {
+    <span class="keyword">val</span> per = <span class="keyword">new</span> Person();
+    per.age = -<span class="number">2</span>
+    println(per.age)
+  } 
+} 
+
+<span class="class"><span class="keyword">class</span> <span class="title">Person</span></span>
+{
+  <span class="keyword">private</span> <span class="keyword">var</span> privateAge = <span class="number">0</span>
+
+  <span class="keyword">def</span> age_=(newValue : Int) { 
+    <span class="keyword">if</span> (newValue &lt; <span class="number">0</span>) {
+      privateAge = <span class="number">0</span>
+    } <span class="keyword">else</span> {
+      privateAge = newValue
+    }             
+  }               
+     
+  <span class="keyword">def</span> age = privateAge
+}
+</pre></td></tr></table></figure>
+
+<p>\7. 编写一个Person类，其主构造器接受一个字符串，该字符串包含名字、空格和姓，如new Person(“Fred Smith”)。提供只读属性firstName和LastName。 </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+</pre></td><td class="code"><pre><span class="keyword">package</span> net.swanlinux.www.test
+
+<span class="class"><span class="keyword">object</span> <span class="title">TestC</span> {</span>
+  <span class="keyword">def</span> main(args : Array[String]) {
+    <span class="keyword">val</span> per = <span class="keyword">new</span> Person(<span class="string">"Fred Smith"</span>);
+    println(per.firstName)
+    println(per.lastName)
+  } 
+} 
+
+<span class="class"><span class="keyword">class</span> <span class="title">Person</span><span class="params">(val name : String)</span></span>
+{
+  <span class="keyword">val</span> firstName = name.split(<span class="string">" "</span>)(<span class="number">0</span>)
+  <span class="keyword">val</span> lastName = name.split(<span class="string">" "</span>)(<span class="number">1</span>)
+}
+</pre></td></tr></table></figure>
+
+<p>\8. 创建一个Car类，以只读属性对应制造商、型号名称、型号年份以及一个可读写的属性用于车牌。提供四组构造器。每一个构造器都要求制造商和型号名称为必填。型号年份以及车牌为可选，如果未填，则型号年份设置为-1，车牌设置为空字符串。你会选择哪一个作为你的主构造器？为什么？</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+</pre></td><td class="code"><pre>
+package net.swanlinux.www.test
+
+object TestC {
+  def main(args : <span class="built_in">Array</span>[<span class="built_in">String</span>]) {
+    val car = <span class="keyword">new</span> Car(<span class="string">"Fred Smith"</span>, <span class="string">"test"</span>, <span class="number">2008</span>, <span class="string">"JX222"</span>);
+    println(car.model)
+  } 
+} 
+
+<span class="keyword">class</span> Car(val maker : <span class="built_in">String</span>, val name : <span class="built_in">String</span>)
+{
+  private <span class="keyword">var</span> privateModel = -<span class="number">1</span>
+  <span class="keyword">var</span> licence = <span class="string">""</span>
+  
+  def <span class="keyword">this</span>(maker : <span class="built_in">String</span>, name : <span class="built_in">String</span>, model : Int) {
+    <span class="keyword">this</span>(maker, name)
+    <span class="keyword">this</span>.privateModel = model
+  }     
+        
+  def <span class="keyword">this</span>(maker : <span class="built_in">String</span>, name : <span class="built_in">String</span>, model : Int, licence : <span class="built_in">String</span>) {
+    <span class="keyword">this</span>(maker, name, model)
+    <span class="keyword">this</span>.licence = licence
+  } 
+  
+  def <span class="keyword">this</span>(maker : <span class="built_in">String</span>, name : <span class="built_in">String</span>, licence : <span class="built_in">String</span>) {
+    <span class="keyword">this</span>(maker, name)
+    <span class="keyword">this</span>.licence = licence
+  } 
+  
+  def model = privateModel
+}
+</pre></td></tr></table></figure>
+
+<p>\10. 考虑如下类：</p>
+<p>class Employee(val name: String, var salary: Double) {</p>
+<p>  def this() {this(“John Q. Public”, 0.0)}</p>
+<p>}</p>
+<p>重写该类，使用显式的字段定义，和一个缺省主构造器。你更倾向于使用哪一种形式？为什么？</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+</pre></td><td class="code"><pre><span class="keyword">package</span> net.swanlinux.www.test
+
+<span class="class"><span class="keyword">object</span> <span class="title">TestC</span> {</span>
+  <span class="keyword">def</span> main(args : Array[String]) {
+    <span class="keyword">val</span> em = <span class="keyword">new</span> Employee();
+    println(em.name)
+  } 
+} 
+
+<span class="class"><span class="keyword">class</span> <span class="title">Employee</span></span>
+{
+  <span class="keyword">private</span> <span class="keyword">var</span> privateName = <span class="string">"John Q. Public"</span>
+  <span class="keyword">private</span> <span class="keyword">var</span> privateSalary = <span class="number">0.0</span>
+  
+  <span class="keyword">def</span> <span class="keyword">this</span>(name : String, salary : Double) {
+    <span class="keyword">this</span>()
+    <span class="keyword">this</span>.privateName = name
+    <span class="keyword">this</span>.privateSalary = salary
+  } 
+  
+  <span class="keyword">def</span> name = privateName
+  
+  <span class="keyword">def</span> salary = privateSalary
+}
+</pre></td></tr></table></figure>
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/scala/">scala</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/《快学scala》练习/">《快学scala》练习</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.swanlinux.net/2014/09/08/scala_note_5/" data-title="《快学scala》第五章 类 | Swan" data-tsina="1810958350" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/09/08/scala_note_6/" title="《快学scala》第六章 对象">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  《快学scala》第六章 对象</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/09/08/scala_note_4/"  title="《快学scala》第四章 映射和元组">
+ <strong>NEXT:</strong><br/> 
+ <span>《快学scala》第四章 映射和元组
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/C 语言/" title="C 语言">C 语言<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/categories/linux/" title="linux">linux<sup>21</sup></a></li>
+		
+			<li><a href="/categories/php/" title="php">php<sup>5</sup></a></li>
+		
+			<li><a href="/categories/《C++ Primer Plus(第6版)》练习/" title="《C++ Primer Plus(第6版)》练习">《C++ Primer Plus(第6版)》练习<sup>2</sup></a></li>
+		
+			<li><a href="/categories/《unix 高级编程》-Note/" title="《unix 高级编程》-Note">《unix 高级编程》-Note<sup>9</sup></a></li>
+		
+			<li><a href="/categories/《快学scala》练习/" title="《快学scala》练习">《快学scala》练习<sup>16</sup></a></li>
+		
+			<li><a href="/categories/虚拟技术/" title="虚拟技术">虚拟技术<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05">五月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04">四月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10">十月 2014</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09">九月 2014</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04">四月 2014</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03">三月 2014</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02">二月 2014</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09">九月 2013</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05">五月 2013</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/02">二月 2013</a><span class="archive-list-count">20</span></li></ul>
+  </div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/C++/" title="C++">C++<sup>2</sup></a></li>
+		
+			<li><a href="/tags/GIT/" title="GIT">GIT<sup>1</sup></a></li>
+		
+			<li><a href="/tags/apache/" title="apache">apache<sup>1</sup></a></li>
+		
+			<li><a href="/tags/crontab at/" title="crontab at">crontab at<sup>1</sup></a></li>
+		
+			<li><a href="/tags/directory/" title="directory">directory<sup>1</sup></a></li>
+		
+			<li><a href="/tags/dns/" title="dns">dns<sup>1</sup></a></li>
+		
+			<li><a href="/tags/esxi/" title="esxi">esxi<sup>1</sup></a></li>
+		
+			<li><a href="/tags/extern/" title="extern">extern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/file io/" title="file io">file io<sup>3</sup></a></li>
+		
+			<li><a href="/tags/firewall/" title="firewall">firewall<sup>1</sup></a></li>
+		
+			<li><a href="/tags/ftp/" title="ftp">ftp<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hadoop/" title="hadoop">hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/tags/lvs/" title="lvs">lvs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/network/" title="network">network<sup>1</sup></a></li>
+		
+			<li><a href="/tags/newt/" title="newt">newt<sup>4</sup></a></li>
+		
+			<li><a href="/tags/nfs/" title="nfs">nfs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/process/" title="process">process<sup>4</sup></a></li>
+		
+			<li><a href="/tags/public/" title="public">public<sup>1</sup></a></li>
+		
+			<li><a href="/tags/quota/" title="quota">quota<sup>1</sup></a></li>
+		
+			<li><a href="/tags/raid lvm/" title="raid lvm">raid lvm<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<div style="float:left"><p> Hello ,I&#39;m Nmred. For now I&#39;m a phper. <br/>
+			Everything in order to facilitate</p></div>
+	 <div style="float:right">
+		<a target="_blank" href="http://weibo.com/u/1810958350?s=6uyXnP"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1810958350/614754d4/1.png"></a>
+	 </div>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/623713456" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/nmred" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://www.swanlinux.net" target="_blank" title="Nmred">Nmred</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    $('#toc.toc-aside').css('display', 'block');
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    $('#toc.toc-aside').css('display', 'none');
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','block');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"nmred"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fbc789c531e32acef9db0c8b33befe435' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+  </body>
+</html>

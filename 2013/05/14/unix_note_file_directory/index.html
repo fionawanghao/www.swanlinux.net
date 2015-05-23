@@ -1,0 +1,1701 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>文件和目录 | Swan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Nmred">
+    
+    <meta name="description" content="stat、fstat 和 lstat 函数
+1
+2
+3
+4
+5
+#include &lt;sys/stat.h&gt;
+int stat(const char *restrict pathname, struct stat *restrict buf);
+int fstat(int filedes,">
+    
+    
+    
+    
+    <link rel="alternative" href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" title="Swan" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="Swan" title="Swan"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Swan">Swan</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/categories">分类</a></li>
+					
+						<li><a href="/tags">标签</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:www.swanlinux.net">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2013/05/14/unix_note_file_directory/" title="文件和目录" itemprop="url">文件和目录</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.swanlinux.net" title="Nmred">Nmred</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2013-05-14T10:13:16.000Z" itemprop="datePublished">5月 14 2013</time>
+    更新日期:<time datetime="2015-04-09T19:06:05.522Z" itemprop="dateModified">4月 10 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#stat、fstat_和_lstat_函数"><span class="toc-number">1.</span> <span class="toc-text">stat、fstat 和 lstat 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#文件类型"><span class="toc-number">2.</span> <span class="toc-text">文件类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置用户ID和设置组ID"><span class="toc-number">3.</span> <span class="toc-text">设置用户ID和设置组ID</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#文件权限位"><span class="toc-number">4.</span> <span class="toc-text">文件权限位</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#access_函数"><span class="toc-number">5.</span> <span class="toc-text">access 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#umask函数"><span class="toc-number">6.</span> <span class="toc-text">umask函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#chmod_和_fchmod_函数"><span class="toc-number">7.</span> <span class="toc-text">chmod 和 fchmod 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#chown,_fchown,_和_lchown_函数"><span class="toc-number">8.</span> <span class="toc-text">chown, fchown, 和 lchown 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#文件长度"><span class="toc-number">9.</span> <span class="toc-text">文件长度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#文件截短"><span class="toc-number">10.</span> <span class="toc-text">文件截短</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#link、unlink、remove和rename函数"><span class="toc-number">11.</span> <span class="toc-text">link、unlink、remove和rename函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#symlink_和_readlink_函数"><span class="toc-number">12.</span> <span class="toc-text">symlink 和 readlink 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#文件时间"><span class="toc-number">13.</span> <span class="toc-text">文件时间</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#utime函数"><span class="toc-number">14.</span> <span class="toc-text">utime函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mkdir_和_rmdir_函数"><span class="toc-number">15.</span> <span class="toc-text">mkdir 和 rmdir 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#读目录"><span class="toc-number">16.</span> <span class="toc-text">读目录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#chdir_、fchdir_和_getcwd_函数"><span class="toc-number">17.</span> <span class="toc-text">chdir 、fchdir 和 getcwd 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设备特殊文件"><span class="toc-number">18.</span> <span class="toc-text">设备特殊文件</span></a></li></ol>
+		</div>
+		
+		<h3 id="stat、fstat_和_lstat_函数">stat、fstat 和 lstat 函数</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;sys/stat.h&gt;</span>
+<span class="keyword">int</span> stat(<span class="keyword">const</span> <span class="keyword">char</span> *<span class="keyword">restrict</span> pathname, <span class="keyword">struct</span> stat *<span class="keyword">restrict</span> buf);
+<span class="keyword">int</span> fstat(<span class="keyword">int</span> filedes, <span class="keyword">struct</span> stat *buf);
+<span class="keyword">int</span> lstat(<span class="keyword">const</span> <span class="keyword">char</span> *<span class="keyword">restrict</span> pathname, <span class="keyword">struct</span> stat *<span class="keyword">restrict</span> buf);
+<span class="comment">// 三个函数的返回值：若成功返回0，若出错返回 -1</span>
+</pre></td></tr></table></figure>
+
+<p>一旦给出了pathname，stat函数就返回与此命令文件有关的信息结构。fstat函数获取已在描述符fieldes上打开文件的有关信息。lstat函数类似于stat,但是当命名的文件是一个符号链接时，lstat返回该符号链接的有关信息,而不是由该符号链接引用文件的信息。</p>
+<p>第二个参数buf是指针，指向一个stat 的结构体：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+</pre></td><td class="code"><pre>struct stat {
+	mode_t    st_mode;
+	ino_t     st_ino;
+	dev_t     st_dev;
+	dev_t     st_rdev;
+	nlink_t   st_nlink;
+	uid_t     st_uid;
+	gid_t     st_gid;
+	off_t     st_size;
+	time_t    st_atime;
+	time_t    st_mtime;
+	time_t    st_ctime;	
+	blksize_t st_blksize;
+	blkcnt_t  st_blksize
+}
+</pre></td></tr></table></figure>
+
+<h3 id="文件类型">文件类型</h3>
+<ul>
+<li>普通文件：是最常用的文件类型，这种文件包含了某种形式的数据.</li>
+<li>目录文件：这种文件包含了其他文件的名字以及指向与这些文件有关信息的指针。对一个目录文件具有读权限的任意进程可以读该目录的内容，但是只有内核可以直接写目录文件。</li>
+<li>块特殊文件：这种文件类型提供对设备（例如磁盘）带缓存的访问，每次访问以固定长度为单位进行。</li>
+<li>字符特殊文件：这种文件类型提供了对设备不带缓存的访问，每次访问的长度可变。</li>
+<li>FIFO: 这种类型文件用于进程间通信，有时也称命名管道.</li>
+<li>套接字：这种文件类型用于进程间的网络通信，套接字也可用于在一台宿主机上进程间的非网络通信.</li>
+<li>符号链接：这种文件类型指向了另一个文件。</li>
+</ul>
+<p>文件类型可以有以下宏来确定：</p>
+<ul>
+<li>S_ISREG()  普通文件</li>
+<li>S_ISDIR()  目录文件</li>
+<li>S_ISCHR()  字符特殊文件</li>
+<li>S_ISBLK()  块特殊文件</li>
+<li>S_ISFIFO() 管道或FIFO</li>
+<li>S_ISLNK()  符号链接</li>
+<li>S_ISSOCK() 套接字</li>
+</ul>
+<p>POSIX.1允许实现将进程间通信（IPC）对象表示为文件，以下宏可以确定类型，它们的参数并非st_mode,而是指向stat结构的指针:</p>
+<ul>
+<li>S_TYPEISMQ()   消息队列</li>
+<li>S_TYPEISSEM()  信号量</li>
+<li>S_TYPEISSHM()  共享存储对象</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+</pre></td><td class="code"><pre><span class="comment">#include "../apue.h"</span>
+
+int main(int argc, char *argv[])
+{
+	int i;
+	struct stat buf;
+	char *ptr;
+
+	for(i = 1; i &lt; argc; i++)
+	{
+		printf(<span class="string">"%s: "</span>, argv[i]);
+		if (lstat(argv[i], &buf) &lt; 0) {
+			err_ret(<span class="string">"lstat error"</span>);
+			continue;
+		}
+
+		if (S_ISREG(buf.st_mode)) {
+			ptr = <span class="string">"regular"</span>;
+		} else if (S_ISDIR(buf.st_mode)) {
+			ptr = <span class="string">"directory"</span>;
+		} else if (S_ISCHR(buf.st_mode)) {
+			ptr = <span class="string">"character special"</span>;
+		} else if (S_ISBLK(buf.st_mode)) {
+			ptr = <span class="string">"block special"</span>;
+		} else if (S_ISFIFO(buf.st_mode)) {
+			ptr = <span class="string">"fifo"</span>;
+		} else if (S_ISLNK(buf.st_mode)) {
+			ptr = <span class="string">"symbolic link"</span>;
+		} else if (S_ISSOCK(buf.st_mode)) {
+			ptr = <span class="string">"socket"</span>;
+		} else {
+			ptr = <span class="string">"** unknown mode **"</span>;
+		}
+
+		printf(<span class="string">"%s \n"</span>, ptr);
+	}
+
+	exit(0);
+}
+</pre></td></tr></table></figure>
+
+<h3 id="设置用户ID和设置组ID">设置用户ID和设置组ID</h3>
+<ul>
+<li>实际用户ID和实际组ID标识我们究竟是谁。</li>
+<li>有效用户 ID，有效组ID已经附加组ID决定了我们的文件访问权限.</li>
+<li>保存的设置用户ID和保存呢的设置组ID在执行一个程序时包含了有效用户ID和有效组ID的副本。</li>
+</ul>
+<h3 id="文件权限位">文件权限位</h3>
+<ul>
+<li>S_IRUSR 用户-读</li>
+<li>S_IWUSR 用户-写</li>
+<li>S_IXUSR 用户-执行</li>
+</ul>
+<ul>
+<li>S_IRGRP 组-读</li>
+<li>S_IWGRP 组-写</li>
+<li>S_IXGRP 组-执行</li>
+</ul>
+<ul>
+<li>S_IROTH 其他-读</li>
+<li>S_IWOTH 其他-写</li>
+<li>S_IXOTH 其他-执行</li>
+</ul>
+<h3 id="access_函数">access 函数</h3>
+<p>当用open函数打开一个文件时，内核以进程的有效用户ID和有效组ID为基础执行其访问权限测试。有时，进程也希望按其实际用户ID和实际组ID来测试其访问能力，例如当一个进程使用设置用户ID或设置组ID特征作为另一个用户运行时，就可能会有这种需要，access函数是按实际用户ID和实际组ID进行访问权限测试。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;unistd.h&gt;</span>
+<span class="keyword">int</span> access(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, <span class="keyword">int</span> mode);
+
+<span class="comment">// 返回值：若成功则返回0，若出错则返回-1</span>
+</pre></td></tr></table></figure>
+
+<p>其中，mode是以下的常量按位或：</p>
+<ul>
+<li>R_OK 测试读权限</li>
+<li>W_OK 测试写权限</li>
+<li>X_OK 测试执行权限</li>
+<li>F_OK 测试文件是否存在</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+</pre></td><td class="code"><pre><span class="comment">#include "../apue.h"</span>
+<span class="comment">#include &lt;fcntl.h&gt;</span>
+
+<span class="keyword">int</span> main(<span class="keyword">int</span> argc, char <span class="variable">*argv</span>[])
+{
+	<span class="keyword">if</span> (argc != <span class="number">2</span>) {
+		err_quit(<span class="string">"usage:a.out &lt;pathname&gt;"</span>);
+	}
+
+	<span class="keyword">if</span> (access(argv[<span class="number">1</span>], R_OK) &lt; <span class="number">0</span>) {
+		err_ret(<span class="string">"access error for <span class="variable">%s</span>"</span>, argv[<span class="number">1</span>]);
+	} <span class="keyword">else</span> {
+		<span class="keyword">printf</span>(<span class="string">"read access OK\n"</span>);
+	}
+
+	<span class="keyword">if</span> (<span class="keyword">open</span>(argv[<span class="number">1</span>], O_RDONLY) &lt; <span class="number">0</span>) {
+		err_ret(<span class="string">"open error for <span class="variable">%s</span>"</span>, argv[<span class="number">1</span>]);
+	} <span class="keyword">else</span> {
+		<span class="keyword">printf</span>(<span class="string">"open for reading OK \n"</span>);
+	}
+
+	<span class="keyword">exit</span>(<span class="number">0</span>);
+}
+</pre></td></tr></table></figure>
+
+<h3 id="umask函数">umask函数</h3>
+<p>umask 函数为进程设置文件模式创建屏蔽字，并返回以前的值。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+</pre></td><td class="code"><pre><span class="comment">#include &lt;sys/stat.h&gt;</span>
+mode_t umask(mode_t cmask);
+// 返回以前的文件模式创建的屏蔽字
+
+<span class="comment">#include "../apue.h"</span>
+<span class="comment">#include &lt;fcntl.h&gt;</span>
+
+<span class="comment">#define RWRWRW (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)</span>
+
+int main(void)
+{
+	umask(0);
+	if (creat(<span class="string">"foo"</span>, RWRWRW) &lt; 0) {
+		err_sys(<span class="string">"create error for foo"</span>);
+	}
+
+	umask(S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
+
+	if (creat(<span class="string">"bar"</span>, RWRWRW) &lt; 0) {
+		err_sys(<span class="string">"create error for bar"</span>);
+	}
+
+	exit(0);
+}
+</pre></td></tr></table></figure>
+
+<p>运行结果：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+</pre></td><td class="code"><pre><span class="attribute">-rw</span><span class="subst">-------</span> <span class="number">1</span> root root    <span class="number">0</span> May <span class="number">25</span> <span class="number">00</span>:<span class="number">42</span> bar
+<span class="attribute">-rw</span><span class="attribute">-rw</span><span class="attribute">-rw</span><span class="subst">-</span> <span class="number">1</span> root root    <span class="number">0</span> May <span class="number">25</span> <span class="number">00</span>:<span class="number">42</span> foo
+</pre></td></tr></table></figure>
+
+<h3 id="chmod_和_fchmod_函数">chmod 和 fchmod 函数</h3>
+<p>这两个函数使我们可以更改现有文件的访问权限：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;sys/stat.h&gt;</span>
+<span class="keyword">int</span> chmod(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, mode_t mode);
+<span class="keyword">int</span> fchmod(<span class="keyword">int</span> filedes, mode_t mode);
+
+<span class="comment">// 这两个函数返回值：若成功返回 0，出错返回 -1</span>
+</pre></td></tr></table></figure>
+
+<p>参数mode 是由以下常量按位或运算构成：</p>
+<ul>
+<li>S_ISUID 执行时设置用户ID</li>
+<li>S_ISGID 执行时设置组ID</li>
+<li>S_ISVTX 保存正文(粘着位)</li>
+</ul>
+<ul>
+<li>S_IRWXU 用户（所有者）读、写和执行</li>
+<li>S_IRUSR 用户-读</li>
+<li>S_IWUSR 用户-写</li>
+<li>S_IXUSR 用户-执行</li>
+</ul>
+<ul>
+<li>S_IRWXG 组读、写和执行</li>
+<li>S_IRGRP 组-读</li>
+<li>S_IWGRP 组-写</li>
+<li>S_IXGRP 组-执行</li>
+</ul>
+<ul>
+<li>S_IRWXO 其他读、写和执行</li>
+<li>S_IROTH 其他-读</li>
+<li>S_IWOTH 其他-写</li>
+<li>S_IXOTH 其他-执行</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+</pre></td><td class="code"><pre><span class="comment">#include "../apue.h"</span>
+
+int main(void)
+{
+	struct stat statbuf;
+
+	if (stat(<span class="string">"foo"</span>, &statbuf) &lt; 0) {
+		err_sys(<span class="string">"stat error for foo"</span>);
+	}
+
+	if (chmod(<span class="string">"foo"</span>, (statbuf.st_mode & ~S_IXGRP) | S_ISGID) &lt; 0) {
+		err_sys(<span class="string">"chmod error for foo"</span>);
+	}
+
+	if (chmod(<span class="string">"bar"</span>, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH) &lt; 0) {
+		err_sys(<span class="string">"chmod error for bar"</span>);
+	}
+
+	exit(0);
+}
+</pre></td></tr></table></figure>
+
+<p>运行结果：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+</pre></td><td class="code"><pre><span class="attribute">-rw</span><span class="attribute">-r</span><span class="subst">--</span>r<span class="subst">--</span> <span class="number">1</span> root root    <span class="number">0</span> May <span class="number">25</span> <span class="number">00</span>:<span class="number">42</span> bar
+<span class="attribute">-rw</span><span class="attribute">-rwSrw</span><span class="subst">-</span> <span class="number">1</span> root root    <span class="number">0</span> May <span class="number">25</span> <span class="number">00</span>:<span class="number">42</span> foo
+</pre></td></tr></table></figure>
+
+<h3 id="chown,_fchown,_和_lchown_函数">chown, fchown, 和 lchown 函数</h3>
+<p>下面几个chown函数可用于更改文件的用户ID和组ID：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;unistd.h&gt;</span>
+
+<span class="keyword">int</span> chown(<span class="keyword">const</span> <span class="keyword">char</span> *pathname,uid_t owner, gid_t <span class="keyword">group</span>);
+<span class="keyword">int</span> fchown(<span class="keyword">int</span> filedes, uid_t owner, gid_t <span class="keyword">group</span>);
+<span class="keyword">int</span> lchown(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, uid_t owner, gid_t <span class="keyword">group</span>);
+<span class="comment">// 三个函数的返回值：成功返回0， 若出错则返回-1</span>
+</pre></td></tr></table></figure>
+
+<p>除了所引用的文件是符号链接以外，这个三个函数的操作相似。在符号连接下的情况下，lchown更改符号链接本身的所有者，而不是该符号链接所指的文件。</p>
+<p>如果两个参数owner或group中的任意一个是 -1，则对应的ID不变。</p>
+<p>如果这些函数由非超级用户进程调用，则在成功返回时，该文件设置用户ID位和设置组位都会被清除。</p>
+<h3 id="文件长度">文件长度</h3>
+<p>stat 结构成员 st_size 表示以字节为单位的文件长度。此字段对普通文件、目录文件和符号链接有意义。</p>
+<ul>
+<li>对于普通文件，其文件长度可以是0，在读这种文件时，将得到文件结束指示.</li>
+<li>对于目录，文件长度通常是一个数的倍数.</li>
+<li>对于符号链接，文件长度是文件名中的实际字节数。</li>
+</ul>
+<p>大多数UNIX系统提供字段st_blksize和st_blocks，其中，第一个对文件I/O较合适的块长度，第二个是所分配的实际512字节块数量。</p>
+<h3 id="文件截短">文件截短</h3>
+<p>有时我们需要在文件尾端处截取一些数据以缩短文件，将一个文件清空为0是一个特例，在打开文件时使用O_TRUNC标志可以做到这一点。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;unistd.h&gt;</span>
+<span class="keyword">int</span> truncate(<span class="keyword">const</span> char *pathname, off_t <span class="built_in">length</span>);
+<span class="keyword">int</span> ftruncate(<span class="keyword">int</span> filedes, off_t <span class="built_in">length</span>);
+
+<span class="comment">// 两个函数的返回值：若成功则返回0，如果出错返回-1</span>
+</pre></td></tr></table></figure>
+
+<h3 id="link、unlink、remove和rename函数">link、unlink、remove和rename函数</h3>
+<p>任何一个文件可以多个目录项指向其i节点。创建一个指向现有文件的链接的方法就是使用link函数</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;unistd.h&gt;</span>
+
+<span class="keyword">int</span> link(<span class="keyword">const</span> <span class="keyword">char</span> *existingpath, <span class="keyword">const</span> <span class="keyword">char</span> *newpath);
+<span class="comment">// 返回值：若成功则返回0，若出错则返回 -1</span>
+</pre></td></tr></table></figure>
+
+<p>此函数创建一个新目录项newpath, 它引用现有的文件existingpath, 如若newpath已经存在，则返回出错。只创建newpath中的最后一个分量，路劲中的其他部分应当已经存在。</p>
+<p>为了删除一个现有的目录项，可以调用unlink函数。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;unistd.h&gt;</span>
+
+<span class="keyword">int</span> unlink(<span class="keyword">const</span> <span class="keyword">char</span> *pathname);
+<span class="comment">// 返回值：若成功则返回0，若出错则返回-1</span>
+</pre></td></tr></table></figure>
+
+<p>此函数删除目录项，并将由pathname所引用文件的链接计数减1.如果还有指向该文件的其他链接，则仍可通过其他链接访问文件的数据。如果出错，则不对该文件做任何更改。</p>
+<p>只有当链接计数达到0时，该文件的内容才可被删除。另一个条件也会阻止删除文件的内容—-只要有进程打开了该文件，其内容也不能删除。关闭一个文件时，内核首先检查打开该文件的进程数。如果该数达到0，然后内核检查其链接数，如果这个数也是0，那么就删除该文件的内容。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+</pre></td><td class="code"><pre><span class="comment">#include "../apue.h"</span>
+<span class="comment">#include &lt;fcntl.h&gt;</span>
+
+int main(void)
+{
+	if (open(<span class="string">"tempfile"</span>, O_RDWR) &lt; 0) {
+		err_sys(<span class="string">"open error"</span>);
+	}
+
+	if (unlink(<span class="string">"tempfile"</span>) &lt; 0) {
+		err_sys(<span class="string">"unlink error"</span>);
+	}
+
+	printf(<span class="string">"file unlinked\n"</span>);
+	sleep(15);
+	printf(<span class="string">"done\n"</span>);
+	exit(0);
+}
+</pre></td></tr></table></figure>
+
+<p>用remove函数解除对一个文件或目录的链接。对于文件，remove的功能与unlink相同，对于目录，remove的功能与rmdir相同.</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;stdio.h&gt;</span>
+
+<span class="keyword">int</span> remove(<span class="keyword">const</span> <span class="keyword">char</span> *pathname);
+<span class="comment">// 返回值：若成功则返回0，若出错则返回-1</span>
+</pre></td></tr></table></figure>
+
+<p>文件或目录用rename函数更名：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;stdio.h&gt;</span>
+
+<span class="keyword">int</span> rename(<span class="keyword">const</span> <span class="keyword">char</span> *oldname, <span class="keyword">const</span> <span class="keyword">char</span> *newname);
+<span class="comment">// 返回值：若成功则返回0，若出错则返回 -1</span>
+</pre></td></tr></table></figure>
+
+<ul>
+<li>如果oldname指的是一个文件而不是目录，那么为该文件或符号链接就更名。在这种情况下，如果newname已存在，则它不能引用一个目录，如果newname已存在，而且不是一个目录，则先将该目录想删除然后将oldname更名为newname。</li>
+<li>如若oldname指的是一个目录，那么为该目录更名，如果newname已存在，则它必须引用一个目录，而且该目录应当是空目录。如果newname存在，则现将其删除，然后将oldname更名为newname.</li>
+<li>如若oldname或newname引用符号链接，则处理的是符号链接本身，而不是它所引用的文件.</li>
+<li>作为一个特例，如果oldname和newname引用同一个文件，则函数不做任何更改而成功返回.</li>
+</ul>
+<h3 id="symlink_和_readlink_函数">symlink 和 readlink 函数</h3>
+<p>symlink函数创建一个符号链接函数:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;unistd.h&gt;</span>
+
+<span class="keyword">int</span> symlink(<span class="keyword">const</span> <span class="keyword">char</span> *actualpath, <span class="keyword">const</span> <span class="keyword">char</span> *sympath);
+<span class="comment">// 返回值：若成功则返回0，若出错则返回 -1</span>
+</pre></td></tr></table></figure>
+
+<p>该函数创建了一个指向actualpath的新目录项sympath,在创建此符号链接时，并不要求actualpath已经存在，并且，actualpath和sympath并不需要位于同一个文件系统。</p>
+<p>因为open函数跟随符号链接，所以需要有一种方法打开该链接本身，并读该链接中的名字.</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;unistd.h&gt;</span>
+
+ssize_t readlink(<span class="keyword">const</span> <span class="keyword">char</span> *<span class="keyword">restrict</span> pathname, <span class="keyword">char</span> *<span class="keyword">restrict</span> buf, size_t bufsize);
+<span class="comment">// 返回值：若成功则返回读到的字节数，若出错则返回-1</span>
+</pre></td></tr></table></figure>
+
+<p>此函数组合了open,read和close的所有操作。如果此函数成功执行，则它返回读入buf的字节数，在buf中返回的符号链接的内容不以null字符终止。</p>
+<h3 id="文件时间">文件时间</h3>
+<ul>
+<li>st_atime 文件数据的最后访问时间，read (ls -lu)</li>
+<li>st_mtime 文件数据的最后修改时间，write (ls 默认)</li>
+<li>st_ctime i节点状态的最后修改时间 chmod,chwon (ls -lc)</li>
+</ul>
+<p>注意修改时间(st_mtime) 和更改状态时间(st_ctime)之间的区别，修改时间文件内容最后一次被修改的时间，更改状态时间是该文件的i 节点最后一次被修改的时间。注意，文件并不保存对一个i节点的最后一次访问时间，所以access和stat函数并不更改这三个时间。</p>
+<h3 id="utime函数">utime函数</h3>
+<p>一个文件的访问和修改时间可以用utime函数更改。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;utime.h&gt;</span>
+
+<span class="keyword">int</span> utime(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, <span class="keyword">const</span> <span class="keyword">struct</span> utimbuf *times);
+
+<span class="comment">// 返回值：若成功则返回0， 若出错则返回 -1</span>
+
+数据结构：
+<span class="keyword">struct</span> utimbuf {
+	time_t actime; <span class="comment">// access time</span>
+	time_t modtime; <span class="comment">// modify time	</span>
+};
+</pre></td></tr></table></figure>
+
+<p>此函数的操作以及执行它所要求的特权取决于times参数是否是NULL:</p>
+<ul>
+<li>如果times 是一个空指针，则访问时间和修改时间两者都设置为当前时间。</li>
+<li>如果times 是非空指针，则访问时间和修改时间被设置为times所指向结构中的值。</li>
+</ul>
+<p>注意，我们不能对更改状态时间st_ctime指定一个值，当调用utime函数时，此字段自动更新.</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+</pre></td><td class="code"><pre><span class="comment">#include "../apue.h"</span>
+<span class="comment">#include &lt;fcntl.h&gt;</span>
+<span class="comment">#include &lt;utime.h&gt;</span>
+
+int main(int argc, char *argv[])
+{
+	int i, fd;
+	struct stat statbuf;
+	struct utimbuf timebuf;
+
+	for (i = 1; i &lt; argc; i++) {
+		if (stat(argv[i], &statbuf) &lt; 0) {
+			err_ret(<span class="string">"%s : stat error"</span>, argv[i]);
+			continue;
+		}
+
+		if ((fd = open(argv[i], O_RDWR | O_TRUNC)) &lt; 0) {
+			err_ret(<span class="string">"%s : open error"</span>, argv[i]);
+			continue;
+		}
+		close(fd);
+
+		timebuf.actime = statbuf.st_atime;
+		timebuf.modtime = statbuf.st_mtime;
+
+		if (utime(argv[i], &timebuf) &lt; 0) {
+			err_ret(<span class="string">"%s : utime error"</span>, argv[i]);
+			continue;
+		}
+	}
+
+	exit(0);
+}
+</pre></td></tr></table></figure>
+
+<h3 id="mkdir_和_rmdir_函数">mkdir 和 rmdir 函数</h3>
+<p>用 mkdir 函数创建目录，用 rmdir 函数删除目录:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;sys/stat.h&gt;</span>
+
+<span class="keyword">int</span> mkdir(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, mode_t mode);
+
+<span class="comment">// 返回值：若成功则返回0，若出错则返回-1</span>
+</pre></td></tr></table></figure>
+
+<p>此函数创建一个新的空目录，其中 . 和 .. 目录项自动创建的，所指定的文件访问权限mode 由进程的文件模式创建屏蔽字修改.</p>
+<p>常见的错误是指定与文件相同的mode(只指定读、写权限). 但是，对于目录通常至少要设置1个执行权限位，以允许访问该目录中的文件名.</p>
+<p>用rmdir 函数可以删除一个空目录，空目录是只包含. 和 .. 这两项的目录.</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;unistd.h&gt;</span>
+
+<span class="keyword">int</span> rmdir(<span class="keyword">const</span> <span class="keyword">char</span> *pathname);
+
+<span class="comment">// 返回值：若成功返回0，若出错则返回 -1</span>
+</pre></td></tr></table></figure>
+
+<h3 id="读目录">读目录</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;dirent.h&gt;</span>
+
+DIR *opendir(<span class="keyword">const</span> <span class="keyword">char</span> *pathname);
+<span class="comment">// 返回值：若成功返回指针，若出错则返回NULL</span>
+
+<span class="keyword">struct</span> dirent *readdir(DIR *dp);
+<span class="comment">// 返回值：若成功则返回指针，若在目录结尾或出错则返回NULL</span>
+
+<span class="keyword">void</span> rewinddir(DIR *dp);
+
+<span class="keyword">int</span> closedir(DIR *dp);
+<span class="comment">// 返回值：若成功则返回0，若出错则返回-1</span>
+
+<span class="keyword">long</span> telldir(DIR *dp);
+<span class="comment">// 返回值：与dp 关联的目录中的当前位置</span>
+
+<span class="keyword">void</span> seekdir(DIR *dp, <span class="keyword">long</span> loc);
+
+
+数据结构：
+
+<span class="keyword">struct</span> dirent{
+	ino_t d_ino;
+	<span class="keyword">char</span> d_name[NAME_MAX + <span class="number">1</span>];
+};
+</pre></td></tr></table></figure>
+
+<p>实例：递归降序遍历目录层次结构，并按文件类型计数</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+</pre></td><td class="code"><pre><span class="preprocessor">#include "../apue.h"</span>
+<span class="preprocessor">#include &lt;dirent.h&gt;</span>
+<span class="preprocessor">#include &lt;errno.h&gt;</span>
+<span class="preprocessor">#include &lt;limits.h&gt;</span>
+
+<span class="keyword">typedef</span> <span class="keyword">int</span> Myfunc(<span class="keyword">const</span> <span class="keyword">char</span> *, <span class="keyword">const</span> <span class="keyword">struct</span> stat *, <span class="keyword">int</span>);
+
+<span class="keyword">static</span> Myfunc myfunc;
+<span class="keyword">static</span> <span class="keyword">int</span> myftw(<span class="keyword">char</span> *, Myfunc *);
+<span class="keyword">static</span> <span class="keyword">int</span> dopath(Myfunc *);
+<span class="keyword">char</span> *path_alloc(<span class="keyword">int</span> *sizep);
+
+<span class="keyword">static</span> <span class="keyword">long</span> nreg, ndir, nblk, nchr, nfifo, nslink, nsock, ntot;
+
+<span class="keyword">int</span> main(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])
+{       
+	<span class="keyword">int</span> ret;
+	<span class="keyword">if</span> (argc != <span class="number">2</span>) {
+		err_quit(<span class="string">"usage: ftw &lt;starting-pathname&gt;"</span>);
+	}
+
+	ret = myftw(argv[<span class="number">1</span>], myfunc);
+
+	ntot = nreg + ndir + nblk + nchr + nfifo + nslink + nsock;
+	<span class="keyword">if</span> (ntot == <span class="number">0</span>) {
+		ntot = <span class="number">1</span>;
+	}
+
+	<span class="built_in">printf</span>(<span class="string">"regular files = %7ld, %5.2f %%\n"</span>, nreg, (nreg * <span class="number">100.0</span>) / ntot);
+	<span class="built_in">printf</span>(<span class="string">"directories files = %7ld, %5.2f %%\n"</span>, ndir, ndir * <span class="number">100.0</span> / ntot);
+	<span class="built_in">printf</span>(<span class="string">"block special  = %7ld, %5.2f %%\n"</span>, nblk, nblk * <span class="number">100.0</span> / ntot);
+	<span class="built_in">printf</span>(<span class="string">"char special   = %7ld, %5.2f %%\n"</span>, nchr, nchr * <span class="number">100.0</span> / ntot);
+	<span class="built_in">printf</span>(<span class="string">"FIFOs          = %7ld, %5.2f %%\n"</span>, nfifo, nfifo * <span class="number">100.0</span> / ntot);
+	<span class="built_in">printf</span>(<span class="string">"symbolic links = %7ld, %5.2f %%\n"</span>, nslink, nslink * <span class="number">100.0</span> / ntot);
+	<span class="built_in">printf</span>(<span class="string">"sockets        = %7ld, %5.2f %%\n"</span>, nsock, nsock * <span class="number">100.0</span> / ntot);
+
+	<span class="built_in">exit</span>(ret);
+}
+
+<span class="preprocessor">#define FTW_F 1</span>
+<span class="preprocessor">#define FTW_D 2</span>
+<span class="preprocessor">#define FTW_DNR 3</span>
+<span class="preprocessor">#define FTW_NS 4</span>
+
+<span class="keyword">static</span> <span class="keyword">char</span> *fullpath;
+
+<span class="keyword">static</span> <span class="keyword">int</span> myftw(<span class="keyword">char</span> *pathname, Myfunc *func)
+{
+	<span class="keyword">int</span> len;
+	fullpath = path_alloc(&len);
+
+	<span class="built_in">strncpy</span>(fullpath, pathname, len);
+
+	<span class="keyword">return</span> (dopath(func));
+}
+
+<span class="keyword">static</span> <span class="keyword">int</span> dopath(Myfunc *func)
+{
+	<span class="keyword">struct</span> stat statbuf;
+	<span class="keyword">struct</span> dirent *dirp;
+	DIR *dp;
+	<span class="keyword">int</span> ret;
+	<span class="keyword">char</span> *ptr;
+
+	<span class="keyword">if</span> (lstat(fullpath, &statbuf) &lt; <span class="number">0</span>) {
+		<span class="keyword">return</span> (func(fullpath, &statbuf, FTW_NS));
+	}
+
+	<span class="keyword">if</span> (S_ISDIR(statbuf.st_mode) == <span class="number">0</span>) {
+		<span class="keyword">return</span> (func(fullpath, &statbuf, FTW_F));
+	}
+
+	ptr = fullpath + <span class="built_in">strlen</span>(fullpath);
+	*ptr++ = <span class="string">'/'</span>;
+	*ptr = <span class="number">0</span>;
+
+	<span class="keyword">if</span> ((dp = opendir(fullpath)) == NULL) {
+		<span class="keyword">return</span> (func(fullpath, &statbuf, FTW_DNR));
+	}
+
+	<span class="keyword">while</span>((dirp = readdir(dp)) != NULL) {
+		<span class="keyword">if</span> (<span class="built_in">strcmp</span>(dirp-&gt;d_name, <span class="string">"."</span>) == <span class="number">0</span> || <span class="built_in">strcmp</span>(dirp-&gt;d_name, <span class="string">".."</span>) == <span class="number">0</span>) {
+			<span class="keyword">continue</span>;
+		}
+
+		<span class="built_in">strcpy</span>(ptr, dirp-&gt;d_name);
+
+		<span class="keyword">if</span> ((ret = dopath(func)) != <span class="number">0</span>) {
+			<span class="keyword">break</span>;
+		}
+	}
+
+	ptr[-<span class="number">1</span>] = <span class="number">0</span>;
+
+	<span class="keyword">if</span> (closedir(dp) &lt; <span class="number">0</span>) {
+		err_ret(<span class="string">"cant't close directory %s"</span>, fullpath);
+	}
+
+	<span class="keyword">return</span> ret;
+}
+
+<span class="keyword">static</span> <span class="keyword">int</span> myfunc(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, <span class="keyword">const</span> <span class="keyword">struct</span> stat *statptr, <span class="keyword">int</span> type)
+{
+	<span class="keyword">switch</span>(type) {
+		<span class="keyword">case</span> FTW_F:
+			<span class="keyword">switch</span> (statptr-&gt;st_mode & S_IFMT) {
+				<span class="keyword">case</span> S_IFREG: nreg++; <span class="keyword">break</span>;
+				<span class="keyword">case</span> S_IFBLK: nblk++; <span class="keyword">break</span>;
+				<span class="keyword">case</span> S_IFCHR: nchr++; <span class="keyword">break</span>;
+				<span class="keyword">case</span> S_IFIFO: nfifo++; <span class="keyword">break</span>;
+				<span class="keyword">case</span> S_IFLNK: nslink++; <span class="keyword">break</span>;
+				<span class="keyword">case</span> S_IFSOCK: nsock++; <span class="keyword">break</span>;
+				<span class="keyword">case</span> S_IFDIR:
+							   err_dump(<span class="string">"for S_ISDIR for %s"</span>, pathname);
+			}
+			<span class="keyword">break</span>;
+		<span class="keyword">case</span> FTW_D:
+			ndir++;
+			<span class="keyword">break</span>;
+		<span class="keyword">case</span> FTW_DNR:
+			err_ret(<span class="string">"can't read directory %s"</span>, pathname);
+			<span class="keyword">break</span>;
+		<span class="keyword">case</span> FTW_NS:
+			err_ret(<span class="string">"stat error for %s"</span>, pathname);
+			<span class="keyword">break</span>;
+		<span class="keyword">default</span>:
+			err_dump(<span class="string">"unknown type %d for pathname %s"</span>, type, pathname);
+	}
+
+	<span class="keyword">return</span> <span class="number">0</span>;
+}
+</pre></td></tr></table></figure>
+
+<p>path_alloc 的实现方法:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+</pre></td><td class="code"><pre><span class="comment">#include "../apue.h"</span>
+<span class="comment">#include &lt;errno.h&gt;</span>
+<span class="comment">#include &lt;limits.h&gt;</span>
+
+<span class="comment">#ifdef PATH_MAX</span>
+static int pathmax = PATH_MAX;
+<span class="comment">#else</span>
+static int pathmax = 0;
+<span class="comment">#endif</span>
+<span class="comment">#define SUSV3 200112L</span>
+static long posix_version = 0;
+<span class="comment">#define PATH_MAX_GUESS 1024</span>
+
+char *path_alloc(int *sizep)
+{       
+	void *ptr;
+	int size;
+
+	if (posix_version == 0) {
+		posix_version = sysconf(_SC_VERSION);
+	}
+
+	if (pathmax == 0) {
+		errno = 0;
+		if ((pathmax = pathconf(<span class="string">"/"</span>, _PC_PATH_MAX)) &lt; 0) {
+			if (errno == 0) {
+				pathmax = PATH_MAX_GUESS;
+			} else {
+				err_sys(<span class="string">"pathconf error for _PC_PATH_MAX"</span>); 
+			}
+		} else {
+			pathmax++;
+		}
+	}
+
+	if (posix_version &lt; SUSV3) {
+		size = pathmax + 1;
+	} else {
+		size = pathmax;
+	}
+
+	if ((ptr = malloc(size)) == NULL) {
+		err_sys(<span class="string">"malloc error for pathname"</span>);
+	}
+
+	if (sizep != NULL) {
+		*sizep = size;
+	}
+
+	return (char *) ptr;
+}
+</pre></td></tr></table></figure>
+
+<h3 id="chdir_、fchdir_和_getcwd_函数">chdir 、fchdir 和 getcwd 函数</h3>
+<p>每个进程都有一个当前的工作目录，进程通过调用 chdir 或 fchdir 函数可以更改当前工作目录.</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;unistd.h&gt;</span>
+<span class="keyword">int</span> chdir(<span class="keyword">const</span> <span class="keyword">char</span> *pathname);
+<span class="keyword">int</span> fchdir(<span class="keyword">int</span> filedes);
+<span class="comment">// 两个函数的返回值：若成功则返回0，若出错则返回 -1</span>
+</pre></td></tr></table></figure>
+
+<p>因为当前工作目录是进程的一个属性没，所以它只影响调用chdir的进程本身，而不影响其他进程。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="comment">#include "../apue.h"</span>
+
+<span class="keyword">int</span> main(void)
+{
+	<span class="keyword">if</span> (<span class="keyword">chdir</span>(<span class="string">"/tmp"</span>) &lt; <span class="number">0</span>) {
+		err_sys(<span class="string">"chdir failed."</span>);
+	}
+	<span class="keyword">printf</span>(<span class="string">"chdir to /tmp succeeded\n"</span>);
+	<span class="keyword">exit</span>(<span class="number">0</span>);
+}
+</pre></td></tr></table></figure>
+
+<p>函数 getcwd() 可以获取当前进程的工作目录：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+</pre></td><td class="code"><pre><span class="preprocessor">#include &lt;unistd.h&gt;</span>
+
+<span class="keyword">char</span> *getcwd(<span class="keyword">char</span> *buf, size_t size);
+<span class="comment">// 返回值：若成功则返回buf, 若出错则返回NULL</span>
+</pre></td></tr></table></figure>
+
+<p>向此函数传递两个参数，一个是缓存地址buf, 另一个是缓存的长度 size .该缓存必须由足够的长度若纳绝对路径名再加上一个 NULL 终止字符.</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre></td><td class="code"><pre><span class="comment">#include "../apue.h"</span>
+
+int main(void)
+{
+	char *ptr;
+	int size;
+
+	if (chdir(<span class="string">"/usr"</span>) &lt; 0) {
+		err_sys(<span class="string">"chdir failed."</span>);
+	}
+
+	ptr = path_alloc(&size);
+	if (getcwd(ptr, size) == NULL) {
+		err_sys(<span class="string">"getcwd failed."</span>);
+	}
+
+	printf(<span class="string">"cwd = %s\n"</span>, ptr);
+	exit(0);
+}
+</pre></td></tr></table></figure>
+
+<h3 id="设备特殊文件">设备特殊文件</h3>
+<ul>
+<li>每个文件系统所在的存储设备都由其主、次设备号表示。设备号所用的数据类型是基本系统数据类型 dev_t</li>
+<li>我们通常可以使用两个宏即 major 和 minor来访问主、次设备号。大多数实现都定义了这两个宏。</li>
+<li>系统中的每个文件关联的 st_dev 值是文件系统的设备号，该文件系统包含了这一文件名以及与其对应的 i 节点。</li>
+<li>只有字符特殊文件和块特殊文件才有st_rdev 值，此值包含实际设备的设备号。</li>
+</ul>
+<p>打印 st_dev 和 st_rdev 值(在 linux 下未编译通过)</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+</pre></td><td class="code"><pre><span class="comment">#include "../apue.h"</span>
+
+<span class="comment">#ifdef SOLARIS</span>
+<span class="comment">#include &lt;sys/mkdev.h&gt;</span>
+<span class="comment">#endif</span>
+
+<span class="keyword">int</span> main(<span class="keyword">int</span> argc, char <span class="variable">*argv</span>[])
+{
+	<span class="keyword">int</span> i;
+	struct <span class="keyword">stat</span> buf;
+
+	<span class="keyword">for</span> (i = <span class="number">1</span>; i &lt; argc; i++) {
+		<span class="keyword">printf</span>(<span class="string">"<span class="variable">%s</span>:"</span>, argv[i]);
+		<span class="keyword">if</span> (<span class="keyword">stat</span>(argv[i], &buf) &lt; <span class="number">0</span>) {
+			err_ret(<span class="string">"stat error"</span>);
+			<span class="keyword">continue</span>;   
+		}   
+
+		<span class="keyword">printf</span>(<span class="string">"dev = <span class="variable">%d</span>/<span class="variable">%d</span>"</span>, major(buf.st_dev), minor(buf.st_dev));
+		<span class="keyword">if</span> (S_ISBLK(buf.st_mode) || S_ISLNK(buf.st_mode)) {
+			<span class="keyword">printf</span>(<span class="string">" (<span class="variable">%s</span>) rdev = <span class="variable">%d</span>/<span class="variable">%d</span>"</span>, (S_ISCHR(buf.st_mode)) ? <span class="string">"character"</span> : <span class="string">"block"</span>,
+					major(buf.st_rdev), minor(buf.st_rdev));    
+		}                               
+
+		<span class="keyword">printf</span>(<span class="string">"\n"</span>);
+	}   
+
+	<span class="keyword">exit</span>(<span class="number">0</span>);
+}
+</pre></td></tr></table></figure>
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/directory/">directory</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/《unix 高级编程》-Note/">《unix 高级编程》-Note</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.swanlinux.net/2013/05/14/unix_note_file_directory/" data-title="文件和目录 | Swan" data-tsina="1810958350" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2013/05/16/c_static/" title="C 语言中static用法总结">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  C 语言中static用法总结</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2013/05/14/unix_note_public.c/"  title="UNIX 环境编程测试公共函数">
+ <strong>NEXT:</strong><br/> 
+ <span>UNIX 环境编程测试公共函数
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#stat、fstat_和_lstat_函数"><span class="toc-number">1.</span> <span class="toc-text">stat、fstat 和 lstat 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#文件类型"><span class="toc-number">2.</span> <span class="toc-text">文件类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置用户ID和设置组ID"><span class="toc-number">3.</span> <span class="toc-text">设置用户ID和设置组ID</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#文件权限位"><span class="toc-number">4.</span> <span class="toc-text">文件权限位</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#access_函数"><span class="toc-number">5.</span> <span class="toc-text">access 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#umask函数"><span class="toc-number">6.</span> <span class="toc-text">umask函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#chmod_和_fchmod_函数"><span class="toc-number">7.</span> <span class="toc-text">chmod 和 fchmod 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#chown,_fchown,_和_lchown_函数"><span class="toc-number">8.</span> <span class="toc-text">chown, fchown, 和 lchown 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#文件长度"><span class="toc-number">9.</span> <span class="toc-text">文件长度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#文件截短"><span class="toc-number">10.</span> <span class="toc-text">文件截短</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#link、unlink、remove和rename函数"><span class="toc-number">11.</span> <span class="toc-text">link、unlink、remove和rename函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#symlink_和_readlink_函数"><span class="toc-number">12.</span> <span class="toc-text">symlink 和 readlink 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#文件时间"><span class="toc-number">13.</span> <span class="toc-text">文件时间</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#utime函数"><span class="toc-number">14.</span> <span class="toc-text">utime函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mkdir_和_rmdir_函数"><span class="toc-number">15.</span> <span class="toc-text">mkdir 和 rmdir 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#读目录"><span class="toc-number">16.</span> <span class="toc-text">读目录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#chdir_、fchdir_和_getcwd_函数"><span class="toc-number">17.</span> <span class="toc-text">chdir 、fchdir 和 getcwd 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设备特殊文件"><span class="toc-number">18.</span> <span class="toc-text">设备特殊文件</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/C 语言/" title="C 语言">C 语言<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Hadoop/" title="Hadoop">Hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/categories/linux/" title="linux">linux<sup>21</sup></a></li>
+		
+			<li><a href="/categories/php/" title="php">php<sup>5</sup></a></li>
+		
+			<li><a href="/categories/《C++ Primer Plus(第6版)》练习/" title="《C++ Primer Plus(第6版)》练习">《C++ Primer Plus(第6版)》练习<sup>2</sup></a></li>
+		
+			<li><a href="/categories/《unix 高级编程》-Note/" title="《unix 高级编程》-Note">《unix 高级编程》-Note<sup>9</sup></a></li>
+		
+			<li><a href="/categories/《快学scala》练习/" title="《快学scala》练习">《快学scala》练习<sup>16</sup></a></li>
+		
+			<li><a href="/categories/虚拟技术/" title="虚拟技术">虚拟技术<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+  <div class="archiveslist">
+    <p class="asidetitle"><a href="/archives">归档</a></p>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05">五月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04">四月 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10">十月 2014</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09">九月 2014</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04">四月 2014</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03">三月 2014</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/02">二月 2014</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09">九月 2013</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05">五月 2013</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/02">二月 2013</a><span class="archive-list-count">20</span></li></ul>
+  </div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/C++/" title="C++">C++<sup>2</sup></a></li>
+		
+			<li><a href="/tags/GIT/" title="GIT">GIT<sup>1</sup></a></li>
+		
+			<li><a href="/tags/apache/" title="apache">apache<sup>1</sup></a></li>
+		
+			<li><a href="/tags/crontab at/" title="crontab at">crontab at<sup>1</sup></a></li>
+		
+			<li><a href="/tags/directory/" title="directory">directory<sup>1</sup></a></li>
+		
+			<li><a href="/tags/dns/" title="dns">dns<sup>1</sup></a></li>
+		
+			<li><a href="/tags/esxi/" title="esxi">esxi<sup>1</sup></a></li>
+		
+			<li><a href="/tags/extern/" title="extern">extern<sup>1</sup></a></li>
+		
+			<li><a href="/tags/file io/" title="file io">file io<sup>3</sup></a></li>
+		
+			<li><a href="/tags/firewall/" title="firewall">firewall<sup>1</sup></a></li>
+		
+			<li><a href="/tags/ftp/" title="ftp">ftp<sup>1</sup></a></li>
+		
+			<li><a href="/tags/hadoop/" title="hadoop">hadoop<sup>1</sup></a></li>
+		
+			<li><a href="/tags/lvs/" title="lvs">lvs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/network/" title="network">network<sup>1</sup></a></li>
+		
+			<li><a href="/tags/newt/" title="newt">newt<sup>4</sup></a></li>
+		
+			<li><a href="/tags/nfs/" title="nfs">nfs<sup>1</sup></a></li>
+		
+			<li><a href="/tags/process/" title="process">process<sup>4</sup></a></li>
+		
+			<li><a href="/tags/public/" title="public">public<sup>1</sup></a></li>
+		
+			<li><a href="/tags/quota/" title="quota">quota<sup>1</sup></a></li>
+		
+			<li><a href="/tags/raid lvm/" title="raid lvm">raid lvm<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="http://list.qq.com/cgi-bin/qf_invite?id=b80afaac14427e6cdc0e6e032a2242ceb167652ebe008866" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<div style="float:left"><p> Hello ,I&#39;m Nmred. For now I&#39;m a phper. <br/>
+			Everything in order to facilitate</p></div>
+	 <div style="float:right">
+		<a target="_blank" href="http://weibo.com/u/1810958350?s=6uyXnP"><img border="0" src="http://service.t.sina.com.cn/widget/qmd/1810958350/614754d4/1.png"></a>
+	 </div>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/623713456" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/nmred" target="_blank" title="github"></a>
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://zespia.tw/hexo/" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://www.swanlinux.net" target="_blank" title="Nmred">Nmred</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    $('#toc.toc-aside').css('display', 'block');
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    $('#toc.toc-aside').css('display', 'none');
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','block');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"nmred"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fbc789c531e32acef9db0c8b33befe435' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+  </body>
+</html>
